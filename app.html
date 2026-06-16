@@ -1,0 +1,1673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>YallaEl3ab — Book your pitch</title>
+<style>
+:root{
+  --bg:#0c1322; --bg2:#0a101c; --card:#1a2333; --card2:#222d40;
+  --stroke:rgba(255,255,255,.08); --stroke2:rgba(255,255,255,.16);
+  --txt:#f4f6fb; --muted:#8b96ab;
+  --orange:#ff6a2b; --orange2:#ff8b3d; --green:#22c55e; --gold:#fbbf24;
+  --red:#ef4444; --blue:#3b82f6;
+  --r:18px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#05080f;color:var(--txt);min-height:100vh;display:flex;justify-content:center}
+#phone{width:100%;max-width:430px;min-height:100vh;background:var(--bg);position:relative;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 0 80px rgba(0,0,0,.8)}
+@media(min-width:480px){#phone{margin:14px 0;border-radius:36px;min-height:calc(100vh - 28px);border:1px solid var(--stroke2)}}
+
+/* ====== generic ====== */
+.screen{display:none;flex:1;flex-direction:column;animation:scrIn .4s cubic-bezier(.2,1,.4,1) both;padding-bottom:90px;overflow-y:auto}
+.screen.on{display:flex}
+.screen.noTab{padding-bottom:20px}
+@keyframes scrIn{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:none}}
+h1{font-size:1.7rem;font-weight:800}
+h2{font-size:1.25rem;font-weight:800}
+.muted{color:var(--muted)}
+.pad{padding:18px 18px 0}
+.btn{border:none;cursor:pointer;font-weight:700;font-size:1rem;color:#fff;padding:15px 22px;border-radius:16px;background:linear-gradient(120deg,var(--orange),var(--orange2));transition:transform .2s,box-shadow .25s,filter .25s;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn:hover{filter:brightness(1.08);box-shadow:0 10px 26px rgba(255,106,43,.35)}
+.btn:active{transform:scale(.96)}
+.btn:disabled{filter:saturate(.4) brightness(.7);cursor:not-allowed}
+.btn.ghost{background:var(--card);border:1px solid var(--stroke2)}
+.btn.green{background:linear-gradient(120deg,#16a34a,#22c55e)}
+.btn.red{background:linear-gradient(120deg,#dc2626,#ef4444)}
+.btn.sm{padding:10px 16px;font-size:.88rem;border-radius:13px}
+.ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.45);transform:scale(0);animation:rip .55s ease-out;pointer-events:none}
+@keyframes rip{to{transform:scale(4);opacity:0}}
+.row{display:flex;align-items:center;gap:10px}
+.spacer{flex:1}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:.83rem;font-weight:700;margin-bottom:7px}
+.inwrap{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--stroke2);border-radius:15px;padding:0 14px;transition:border .25s,box-shadow .25s}
+.inwrap:focus-within{border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,106,43,.18)}
+.inwrap .ic{color:var(--muted);font-size:1.25rem;display:flex;align-items:center}
+.inwrap input,.inwrap select{flex:1;border:none;background:transparent;color:var(--txt);font-size:.97rem;padding:14px 0;outline:none;min-width:0}
+.inwrap select option{background:var(--card)}
+.backbtn{width:42px;height:42px;border-radius:50%;border:none;background:var(--card);color:var(--txt);font-size:1.1rem;cursor:pointer;transition:transform .2s}
+.backbtn:hover{transform:translateX(-3px)}
+.chiprow{display:flex;gap:9px;overflow-x:auto;padding:14px 18px 4px;scrollbar-width:none}
+.chiprow::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;display:flex;gap:7px;align-items:center;padding:10px 17px;border-radius:999px;border:1px solid var(--stroke2);background:var(--card);color:var(--txt);font-size:.86rem;font-weight:700;cursor:pointer;transition:all .25s}
+.chip.active{background:linear-gradient(120deg,#ef7438,#ff9760);border-color:transparent;box-shadow:0 4px 12px rgba(255,106,43,.22)}
+.chip:not(.active):hover{transform:translateY(-2px)}
+
+/* ====== pitch art (CSS field images) ====== */
+.pitch{position:relative;overflow:hidden;background:repeating-linear-gradient(90deg,#1f7a3d 0 40px,#1c6e37 40px 80px)}
+.pitch.v2{background:repeating-linear-gradient(180deg,#23864a 0 34px,#1d7440 34px 68px)}
+.pitch.v3{background:repeating-linear-gradient(115deg,#1b6b3a 0 44px,#175e33 44px 88px)}
+.pitch.night{background:repeating-linear-gradient(90deg,#14532d 0 40px,#0f4426 40px 80px)}
+.pitch::before{content:"";position:absolute;inset:8%;border:2px solid rgba(255,255,255,.55);border-radius:4px}
+.pitch::after{content:"";position:absolute;left:50%;top:8%;bottom:8%;width:2px;background:rgba(255,255,255,.55)}
+.pitch .circle{position:absolute;left:50%;top:50%;width:26%;aspect-ratio:1;border:2px solid rgba(255,255,255,.55);border-radius:50%;transform:translate(-50%,-50%)}
+.pitch .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,10,18,.05),rgba(5,10,18,.72))}
+
+/* ====== onboarding ====== */
+.heroTop{height:300px;background:linear-gradient(155deg,#f6b563 0%,#f58a55 36%,#e9707f 72%,#b9588a 100%);position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;overflow:hidden;border-radius:0 0 4px 4px}
+.heroTop .lines{position:absolute;inset:0;background:repeating-linear-gradient(100deg,transparent 0 60px,rgba(255,255,255,.05) 60px 120px);animation:slideLines 14s linear infinite}
+@keyframes slideLines{to{background-position:480px 0}}
+.applogo{width:84px;height:84px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:2.5rem;box-shadow:0 14px 40px rgba(0,0,0,.35);animation:logoPop 1s cubic-bezier(.2,1.6,.4,1) both;user-select:none;cursor:pointer}
+@keyframes logoPop{from{transform:scale(0) rotate(-180deg)}to{transform:scale(1) rotate(0)}}
+.heroTop h1{font-size:2rem;letter-spacing:.3px;animation:fadeUp .7s .25s both}
+.heroTop p{font-weight:600;opacity:.95;animation:fadeUp .7s .4s both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.rolecard{display:flex;align-items:center;gap:14px;background:var(--card);border:1.5px solid var(--stroke2);border-radius:20px;padding:18px;cursor:pointer;transition:all .3s;animation:fadeUp .6s both}
+.rolecard:hover{transform:translateY(-3px)}
+.rolecard.sel{border-color:var(--orange);background:linear-gradient(120deg,rgba(255,106,43,.14),rgba(255,106,43,.05));box-shadow:0 8px 26px rgba(255,106,43,.25)}
+.rolecard .ric{width:54px;height:54px;border-radius:15px;background:var(--card2);display:grid;place-items:center;font-size:1.75rem;color:var(--orange)}
+.rolecard.sel .ric{background:var(--orange)}
+.rolecard b{display:block;font-size:1.02rem}
+.rolecard span{color:var(--muted);font-size:.85rem}
+.radio{width:24px;height:24px;border-radius:50%;border:2px solid var(--muted);margin-left:auto;flex-shrink:0;display:grid;place-items:center;transition:all .25s}
+.rolecard.sel .radio{border-color:var(--orange)}
+.rolecard.sel .radio::after{content:"";width:12px;height:12px;border-radius:50%;background:var(--orange);animation:logoPop .3s both}
+.linkline{text-align:center;color:var(--muted);font-size:.92rem;padding:16px 0}
+.linkline a{color:var(--orange);font-weight:800;cursor:pointer;text-decoration:none}
+
+/* ====== player home ====== */
+.homeHero{background:linear-gradient(150deg,#f79a52,#f07248 55%,#e26277);border-radius:0 0 30px 30px;padding:20px 18px 26px;position:relative;overflow:hidden}
+.homeHero::after{content:"";position:absolute;right:-22px;bottom:-30px;width:150px;height:150px;opacity:.16;transform:rotate(-15deg);background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27white%27%20stroke-width%3D%271.4%27%3E%3Ccircle%20cx%3D%2712%27%20cy%3D%2712%27%20r%3D%279%27/%3E%3Cpath%20d%3D%27M12%207l4%203-1.5%205h-5L8%2010z%27/%3E%3C/svg%3E") center/contain no-repeat}
+.homeHero h1{font-size:2rem;line-height:1.1;margin:16px 0 18px;animation:fadeUp .6s .1s both}
+.avatar{width:42px;height:42px;border-radius:50%;background:#fff;color:var(--orange);display:grid;place-items:center;font-weight:900;font-size:1.1rem;flex-shrink:0}
+.bell{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.18);border:none;color:#fff;font-size:1.4rem;display:grid;place-items:center;cursor:pointer;position:relative;transition:transform .25s}
+.bell:hover{transform:rotate(16deg) scale(1.1)}
+.bell .nd{position:absolute;top:9px;right:10px;width:9px;height:9px;border-radius:50%;background:var(--gold);animation:pulse 1.8s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(251,191,36,.6)}50%{box-shadow:0 0 0 6px rgba(251,191,36,0)}}
+.searchbar{display:flex;align-items:center;gap:10px;background:rgba(13,19,34,.92);border-radius:15px;padding:0 14px;animation:fadeUp .6s .2s both}
+.searchbar input{flex:1;border:none;background:transparent;color:var(--txt);padding:14px 0;outline:none;font-size:.95rem}
+.secHead{display:flex;align-items:center;padding:20px 18px 10px}
+.secHead h2{flex:1}
+.secHead a{color:var(--orange);font-weight:700;font-size:.88rem;cursor:pointer}
+.hscroll{display:flex;gap:14px;overflow-x:auto;padding:4px 18px 8px;scrollbar-width:none}
+.hscroll::-webkit-scrollbar{display:none}
+.mini-card{flex:0 0 200px;background:var(--card);border-radius:18px;overflow:hidden;cursor:pointer;border:1px solid var(--stroke);transition:transform .3s,box-shadow .3s;animation:cardIn .5s both}
+.mini-card:hover{transform:translateY(-6px);box-shadow:0 16px 34px rgba(0,0,0,.45)}
+@keyframes cardIn{from{opacity:0;transform:translateY(26px) scale(.95)}to{opacity:1;transform:none}}
+.mini-card .pitch{height:108px}
+.mini-card .mb{padding:11px 12px;display:flex;flex-direction:column;gap:4px}
+.mini-card .mb b{font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ratep{color:var(--gold);font-weight:800;font-size:.82rem}
+.pricep{color:var(--orange);font-weight:800;font-size:.85rem;margin-left:auto}
+.favbtn{position:absolute;top:10px;left:10px;z-index:3;width:34px;height:34px;border-radius:50%;border:none;background:rgba(8,12,20,.55);backdrop-filter:blur(6px);color:#fff;cursor:pointer;font-size:.95rem;transition:transform .25s}
+.favbtn:hover{transform:scale(1.2)}
+.favbtn.on{color:#ff4d6d;animation:favPop .4s cubic-bezier(.2,2,.4,1)}
+@keyframes favPop{50%{transform:scale(1.55) rotate(10deg)}}
+.sizebadge{position:absolute;top:10px;right:10px;z-index:3;background:rgba(80,32,10,.85);color:#ffb286;font-size:.72rem;font-weight:800;padding:4px 10px;border-radius:999px}
+.bigprice{position:absolute;left:12px;bottom:10px;z-index:3;font-weight:900;font-size:1.35rem;text-shadow:0 2px 10px rgba(0,0,0,.6)}
+.bigprice small{font-weight:600;font-size:.8rem;color:#d8dee9}
+
+/* ====== explore cards ====== */
+.fcard{background:var(--card);border:1px solid var(--stroke);border-radius:20px;overflow:hidden;cursor:pointer;margin:0 18px 16px;transition:transform .3s,box-shadow .3s;animation:cardIn .5s both}
+.fcard:hover{transform:translateY(-5px);box-shadow:0 18px 40px rgba(0,0,0,.5)}
+.fcard .pitch{height:170px}
+.fcard .fb{padding:14px 16px}
+.fcard .fb .nm{display:flex;align-items:center;gap:8px}
+.fcard .fb .nm b{font-size:1.05rem;flex:1}
+.fcard .loc{color:var(--muted);font-size:.86rem;margin-top:4px}
+.tagrow{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.tag{background:var(--card2);border:1px solid var(--stroke);color:var(--muted);font-size:.76rem;font-weight:600;padding:5px 11px;border-radius:9px}
+
+/* ====== tabs bar ====== */
+#tabbar{position:fixed;bottom:calc(14px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:400px;background:rgba(13,18,30,.9);backdrop-filter:blur(18px);border:1px solid var(--stroke2);border-radius:999px;display:none;justify-content:space-around;padding:8px 8px;z-index:50;box-shadow:0 14px 36px rgba(0,0,0,.5)}
+#tabbar.on{display:flex;animation:tabbarIn .5s cubic-bezier(.2,1.2,.4,1) both}
+@keyframes tabbarIn{from{opacity:0;transform:translate(-50%,30px)}to{opacity:1;transform:translate(-50%,0)}}
+.tab{border:none;background:transparent;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.68rem;font-weight:700;cursor:pointer;padding:8px 14px;border-radius:999px;transition:all .25s;position:relative}
+.tab .tic{font-size:1.6rem;display:flex;align-items:center;transition:transform .3s}
+.tab.active{color:var(--orange);background:rgba(255,106,43,.13)}
+.tab.active .tic{transform:translateY(-2px) scale(1.12)}
+.tab:active .tic{transform:scale(.85)}
+
+/* ====== map ====== */
+.mapbox{margin:16px 18px;height:280px;border-radius:22px;background:linear-gradient(140deg,#1a2334,#141c2b);border:1px solid var(--stroke2);position:relative;overflow:hidden}
+.mapbox .grid{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 39px,rgba(255,255,255,.04) 39px 40px),repeating-linear-gradient(90deg,transparent 0 39px,rgba(255,255,255,.04) 39px 40px)}
+.pin{position:absolute;width:40px;height:40px;transform:translate(-50%,-100%);cursor:pointer;animation:pinDrop .7s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes pinDrop{from{transform:translate(-50%,-300%);opacity:0}to{transform:translate(-50%,-100%);opacity:1}}
+.pin .head{width:34px;height:34px;border-radius:50% 50% 50% 4px;transform:rotate(-45deg);background:linear-gradient(135deg,var(--orange),var(--orange2));display:grid;place-items:center;box-shadow:0 8px 18px rgba(255,106,43,.45);transition:transform .25s}
+.pin:hover .head{transform:rotate(-45deg) scale(1.18)}
+.pin .head span{transform:rotate(45deg);font-size:.95rem}
+.cityhead{display:flex;align-items:center;gap:9px;padding:18px 18px 8px;font-weight:800}
+.cityhead .cdot{width:9px;height:9px;border-radius:50%;background:var(--orange)}
+.cityhead .cnt{margin-left:auto;color:var(--muted);font-size:.85rem;font-weight:600}
+.mrow{display:flex;gap:12px;background:var(--card);border:1px solid var(--stroke);border-radius:18px;margin:0 18px 12px;padding:10px;cursor:pointer;transition:transform .25s;animation:cardIn .45s both;align-items:center}
+.mrow:hover{transform:translateX(4px)}
+.mrow .pitch{width:92px;height:74px;border-radius:13px;flex-shrink:0}
+.mrow .info{flex:1;min-width:0}
+.mrow .info b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mrow .info .l{color:var(--muted);font-size:.8rem;margin:3px 0}
+
+/* ====== bookings ====== */
+.tabs2{display:flex;gap:20px;padding:14px 18px 0;border-bottom:1px solid var(--stroke)}
+.t2{padding:10px 2px 12px;color:var(--muted);font-weight:700;font-size:.95rem;cursor:pointer;border:none;background:none;position:relative;transition:color .25s}
+.t2.active{color:var(--orange)}
+.t2.active::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:3px;border-radius:3px;background:var(--orange);animation:growIn .3s both}
+@keyframes growIn{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.bkcard{display:flex;gap:12px;background:var(--card);border:1px solid var(--stroke);border-radius:18px;margin:14px 18px 0;padding:12px;animation:cardIn .45s both;align-items:center}
+.bkcard .pitch{width:86px;height:78px;border-radius:13px;flex-shrink:0}
+.bkcard .info{flex:1;min-width:0}
+.bkcard .info b{font-size:.97rem}
+.bkcard .l{color:var(--muted);font-size:.82rem;margin-top:3px;display:flex;gap:6px;align-items:center}
+.pricetag{font-weight:900;font-size:1.02rem;white-space:nowrap}
+.statuspill{font-size:.7rem;font-weight:800;padding:4px 11px;border-radius:999px;text-transform:lowercase}
+.statuspill.upcoming,.statuspill.confirmed{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.35)}
+.statuspill.pending{background:rgba(251,191,36,.13);color:var(--gold);border:1px solid rgba(251,191,36,.35)}
+.statuspill.cancelled,.statuspill.declined{background:rgba(239,68,68,.13);color:var(--red);border:1px solid rgba(239,68,68,.35)}
+.statuspill.past{background:var(--card2);color:var(--muted);border:1px solid var(--stroke2)}
+.emptybox{text-align:center;padding:70px 30px;animation:fadeUp .5s both}
+.emptybox .eic{width:92px;height:92px;margin:0 auto 18px;border-radius:50%;background:rgba(255,106,43,.13);display:grid;place-items:center;font-size:2.3rem;animation:bounce 2.6s infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.emptybox b{font-size:1.08rem;display:block;margin-bottom:6px}
+.emptybox span{color:var(--muted);font-size:.9rem}
+
+/* ====== profile ====== */
+.profTop{display:flex;flex-direction:column;align-items:center;padding:30px 18px 8px}
+.bigav{width:96px;height:96px;border-radius:50%;background:linear-gradient(135deg,var(--orange),var(--orange2));display:grid;place-items:center;font-size:2.4rem;font-weight:900;box-shadow:0 14px 34px rgba(255,106,43,.35);animation:logoPop .7s both}
+.rolepill{margin-top:10px;background:rgba(120,53,15,.5);color:#ffb286;font-weight:800;font-size:.8rem;padding:6px 15px;border-radius:999px}
+.rankcard{margin:18px;background:linear-gradient(120deg,#162a4d,#13223d);border:1px solid rgba(59,130,246,.25);border-radius:20px;padding:18px;animation:cardIn .5s both}
+.rankcard .pts{font-size:2rem;font-weight:900;color:var(--orange)}
+.pbar{height:8px;border-radius:99px;background:rgba(255,255,255,.09);overflow:hidden;margin:12px 0 8px}
+.pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--orange),var(--gold));border-radius:99px;width:0;transition:width 1.1s cubic-bezier(.2,1,.4,1)}
+.statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:0 18px}
+.scard{background:var(--card);border:1px solid var(--stroke);border-radius:17px;padding:14px;animation:cardIn .5s both}
+.scard .sic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:1.4rem;margin-bottom:10px}
+.scard b{font-size:1.3rem}
+.scard span{display:block;color:var(--muted);font-size:.78rem;margin-top:2px}
+.lsec{padding:22px 18px 8px;color:var(--muted);font-size:.76rem;font-weight:800;letter-spacing:1.5px}
+.lrow{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--stroke);margin:0 18px 10px;padding:15px;border-radius:16px;cursor:pointer;transition:all .25s;animation:cardIn .4s both}
+.lrow:hover{transform:translateX(4px);border-color:var(--stroke2)}
+.lrow .lic{width:42px;height:42px;border-radius:12px;background:var(--card2);display:grid;place-items:center;font-size:1.35rem;flex-shrink:0}
+.lrow b{flex:1;font-size:.95rem;font-weight:700}
+.lrow .arr{color:var(--muted)}
+
+/* ====== owner ====== */
+.ostatgrid{display:grid;grid-template-columns:1fr 1fr;gap:13px;padding:16px 18px 0}
+.ostat{background:var(--card);border:1px solid var(--stroke);border-radius:18px;padding:16px;animation:cardIn .5s both}
+.ostat .oic{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;font-size:1.45rem;margin-bottom:12px}
+.ostat span{color:var(--muted);font-size:.84rem}
+.ostat b{display:block;font-size:1.55rem;margin-top:2px}
+.ostat .delta{font-size:.78rem;font-weight:700;color:var(--green)}
+.reqcard{background:var(--card);border:1px solid var(--stroke);border-radius:19px;margin:12px 18px 0;padding:13px;animation:cardIn .5s both}
+.reqcard .top{display:flex;gap:12px;align-items:center}
+.reqcard .pitch{width:74px;height:64px;border-radius:12px;flex-shrink:0}
+.reqcard .l{color:var(--muted);font-size:.82rem;margin-top:3px}
+.reqbtns{display:flex;gap:10px;margin-top:13px}
+.reqbtns .btn{flex:1;padding:12px}
+.subbanner{margin:14px 18px 0;border-radius:18px;padding:15px 16px;display:flex;gap:12px;align-items:center;animation:cardIn .5s both;border:1px solid}
+.subbanner.bad{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.35)}
+.subbanner.ok{background:rgba(34,197,94,.09);border-color:rgba(34,197,94,.3)}
+.subbanner b{display:block;font-size:.95rem}
+.subbanner span{color:var(--muted);font-size:.82rem}
+.earnhero{margin:16px 18px 0;background:linear-gradient(130deg,#ff7a1f,#ef5e0e);border-radius:22px;padding:22px;animation:cardIn .5s both;position:relative;overflow:hidden}
+.earnhero::after{content:"";position:absolute;right:6px;bottom:6px;width:96px;height:96px;opacity:.2;background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27white%27%20stroke-width%3D%271.4%27%3E%3Cellipse%20cx%3D%2712%27%20cy%3D%276%27%20rx%3D%278%27%20ry%3D%273%27/%3E%3Cpath%20d%3D%27M4%206v6c0%201.7%203.6%203%208%203s8-1.3%208-3V6%27/%3E%3Cpath%20d%3D%27M4%2012v6c0%201.7%203.6%203%208%203s8-1.3%208-3v-6%27/%3E%3C/svg%3E") center/contain no-repeat}
+.earnhero .amt{font-size:2.3rem;font-weight:900;margin:6px 0}
+.chartbox{margin:14px 18px;background:var(--card);border:1px solid var(--stroke);border-radius:20px;padding:18px;animation:cardIn .5s both}
+.chart{display:flex;align-items:flex-end;gap:10px;height:130px;margin-top:14px}
+.cbar{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;height:100%;justify-content:flex-end}
+.cbar i{width:100%;max-width:30px;border-radius:8px 8px 3px 3px;background:linear-gradient(180deg,var(--orange),rgba(255,106,43,.35));height:0;transition:height 1s cubic-bezier(.2,1,.4,1)}
+.cbar span{font-size:.72rem;color:var(--muted);font-weight:700}
+.payrow{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--stroke);border-radius:16px;margin:0 18px 11px;padding:13px 15px;animation:cardIn .4s both}
+.payrow .pic2{width:44px;height:44px;border-radius:13px;background:var(--card2);display:grid;place-items:center;font-size:1.4rem}
+.payrow b{display:block;font-size:.93rem}
+.payrow span{color:var(--muted);font-size:.79rem}
+.payrow .amt2{margin-left:auto;font-weight:900;color:var(--green)}
+
+/* ====== subscription card ====== */
+.subcard{margin:16px 18px 0;background:linear-gradient(135deg,#1d2b45,#16203a);border:1px solid rgba(59,130,246,.3);border-radius:22px;padding:20px;animation:cardIn .5s both;position:relative;overflow:hidden}
+.subcard::after{display:none}
+.subcard .price{font-size:2rem;font-weight:900}
+.subcard .price small{font-size:.95rem;color:var(--muted);font-weight:600}
+.subring{display:flex;gap:14px;align-items:center;margin-top:14px}
+.ringy{width:74px;height:74px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;font-size:1.5rem;background:conic-gradient(var(--rc,#22c55e) var(--pp,70%),rgba(255,255,255,.08) 0)}
+.ringy>div{width:58px;height:58px;border-radius:50%;background:#16203a;display:grid;place-items:center}
+
+/* ====== payment methods ====== */
+.pmgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:6px}
+.pm{border:1.5px solid var(--stroke2);background:var(--card);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:all .25s;position:relative}
+.pm:hover{transform:translateY(-3px)}
+.pm.sel{border-color:var(--orange);background:rgba(255,106,43,.1);box-shadow:0 6px 20px rgba(255,106,43,.22)}
+.pm .pmlogo{height:30px;display:flex;align-items:center}
+.pm .pmname{font-size:.82rem;color:var(--muted);font-weight:600}
+.pm .chk{position:absolute;top:9px;right:9px;width:20px;height:20px;border-radius:50%;background:var(--orange);color:#fff;display:none;place-items:center;font-size:.7rem;animation:logoPop .3s both}
+.pm.sel .chk{display:grid}
+/* locked payment methods (subscriptions are InstaPay-only) */
+.pm.locked{cursor:not-allowed;opacity:.6;border-style:dashed}
+.pm.locked .pmlogo{filter:grayscale(.85);opacity:.7}
+.pm.locked .pmname{color:#6b7689}
+.pm .lockbadge{position:absolute;top:8px;right:8px;width:23px;height:23px;border-radius:50%;background:rgba(8,12,20,.75);border:1px solid var(--stroke2);display:grid;place-items:center;color:#cbd2e0;font-size:.74rem;z-index:4;animation:lockWiggle 2.6s ease-in-out infinite}
+@keyframes lockWiggle{0%,86%,100%{transform:rotate(0)}90%{transform:rotate(-13deg)}95%{transform:rotate(13deg)}}
+/* animated payment-brand SVG logos */
+.pmlogo .pay-svg{height:24px;width:auto;display:block;overflow:visible}
+.ico{display:inline-flex;align-items:center;justify-content:center;width:1.22em;height:1.22em;line-height:0;vertical-align:-.2em;flex-shrink:0}
+.ico svg{width:100%;height:100%;display:block;stroke-width:2.1;overflow:visible}
+/* slightly thinner strokes for icons sitting inside chunky rounded chips */
+.lic .ico svg,.oic .ico svg,.sic .ico svg,.ric .ico svg,.eic .ico svg,.pic2 .ico svg{stroke-width:1.85}
+
+/* ====== membership paywall ====== */
+.pwIcon{width:74px;height:74px;margin:22px auto 2px;border-radius:22px;display:grid;place-items:center;color:#fff;font-size:2.1rem;background:linear-gradient(135deg,var(--orange),var(--orange2));box-shadow:0 10px 24px rgba(255,106,43,.3);animation:logoPop .7s both}
+.pwFeat{list-style:none;margin-top:14px;display:flex;flex-direction:column;gap:11px}
+.pwFeat li{display:flex;align-items:center;gap:11px;font-size:.93rem;font-weight:600}
+.pwFeat li .ico{color:var(--green);font-size:1.15rem}
+.trialbtn{background:linear-gradient(120deg,#16a34a,#22c55e)!important;box-shadow:0 6px 16px rgba(34,197,94,.28);border-radius:14px}
+.trialbtn:hover{box-shadow:0 10px 28px rgba(34,197,94,.55)!important}
+.trialbtn:disabled{background:var(--card2)!important;color:var(--muted);box-shadow:none;filter:none}
+.pwOr{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:.78rem;font-weight:700;margin:14px 0 8px}
+.pwOr::before,.pwOr::after{content:"";flex:1;height:1px;background:var(--stroke2)}
+.trialpill{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.35);font-weight:800;font-size:.7rem;padding:4px 11px;border-radius:999px;text-transform:uppercase;letter-spacing:.5px}
+
+/* ====== modals / sheets ====== */
+.overlay{position:fixed;inset:0;background:rgba(3,6,12,.66);backdrop-filter:blur(6px);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s}
+.overlay.show{opacity:1;pointer-events:auto}
+.sheet{width:100%;max-width:430px;max-height:88vh;overflow-y:auto;background:var(--bg);border-radius:28px 28px 0 0;border-top:1px solid var(--stroke2);padding:10px 20px 26px;transform:translateY(100%);transition:transform .45s cubic-bezier(.2,1.1,.3,1)}
+.overlay.show .sheet{transform:none}
+.grab{width:44px;height:5px;border-radius:99px;background:var(--stroke2);margin:6px auto 16px}
+.slotgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.slot{padding:12px 4px;text-align:center;border-radius:13px;border:1px solid var(--stroke2);background:var(--card);cursor:pointer;font-size:.86rem;font-weight:700;transition:all .2s}
+.slot:hover{transform:scale(1.05)}
+.slot.sel{background:var(--orange);border-color:var(--orange);box-shadow:0 6px 16px rgba(255,106,43,.4)}
+.slot.taken{opacity:.32;cursor:not-allowed;text-decoration:line-through}
+.summary{background:var(--card);border:1px solid var(--stroke);border-radius:16px;padding:14px;margin-top:6px}
+.summary .srow{display:flex;justify-content:space-between;padding:5px 0;font-size:.92rem}
+.summary .srow span{color:var(--muted)}
+.summary .srow.tot{border-top:1px dashed var(--stroke2);margin-top:7px;padding-top:11px;font-weight:900;font-size:1.05rem}
+.summary .srow.tot span{color:var(--txt)}
+
+/* toasts / confetti / notif */
+#toasts{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:400;display:flex;flex-direction:column;gap:9px;align-items:center;width:min(92vw,400px)}
+.toast{background:rgba(20,28,44,.96);border:1px solid var(--stroke2);border-radius:15px;padding:12px 19px;font-weight:600;font-size:.9rem;display:flex;gap:9px;align-items:center;box-shadow:0 14px 34px rgba(0,0,0,.5);animation:tIn .4s cubic-bezier(.2,1.5,.4,1),tOut .4s 3.1s forwards}
+@keyframes tIn{from{transform:translateY(-50px) scale(.85);opacity:0}}
+@keyframes tOut{to{transform:translateY(-18px);opacity:0}}
+.confetti{position:fixed;width:9px;height:9px;z-index:500;pointer-events:none;animation:cf linear forwards}
+@keyframes cf{to{transform:translateY(104vh) rotate(740deg);opacity:.15}}
+.aiFab{position:fixed;bottom:96px;right:calc(50% - 215px + 18px);z-index:60;width:54px;height:54px;border-radius:50%;border:none;cursor:pointer;font-size:1.4rem;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;box-shadow:0 10px 28px rgba(124,58,237,.5);animation:pulse2 2.6s infinite;transition:transform .3s;display:none}
+.aiFab.on{display:block}
+@media(max-width:480px){.aiFab{right:16px}}
+.aiFab:hover{transform:scale(1.12) rotate(8deg)}
+@keyframes pulse2{0%,100%{box-shadow:0 10px 28px rgba(124,58,237,.5)}50%{box-shadow:0 10px 28px rgba(124,58,237,.5),0 0 0 12px rgba(168,85,247,.13)}}
+#aiMsgs{display:flex;flex-direction:column;gap:10px;max-height:46vh;overflow-y:auto;padding:4px 0 10px}
+.msg{max-width:86%;padding:11px 14px;border-radius:16px;font-size:.9rem;line-height:1.5;animation:cardIn .35s both;white-space:pre-line}
+.msg.ai{background:var(--card);border:1px solid var(--stroke2);align-self:flex-start;border-bottom-left-radius:4px}
+.msg.me{background:linear-gradient(120deg,#7c3aed,#a855f7);align-self:flex-end;border-bottom-right-radius:4px}
+.mini{display:inline-block;margin:7px 6px 0 0;padding:6px 13px;border-radius:999px;background:var(--card2);border:1px solid var(--stroke2);font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s}
+.mini:hover{background:var(--orange);border-color:var(--orange)}
+.typing span{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--muted);margin-right:4px;animation:blink 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{transform:scale(.7);opacity:.4}40%{transform:scale(1.2);opacity:1}}
+.shakeX{animation:shakeX .4s}
+@keyframes shakeX{20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+.notice{margin-top:4px;background:rgba(120,53,15,.35);border:1px solid rgba(255,138,61,.3);color:#ffb98a;font-size:.82rem;padding:12px 14px;border-radius:13px;display:flex;gap:8px}
+
+/* ============================================================
+   EXTRA MOTION LAYER — richer, lively animations everywhere
+   ============================================================ */
+@keyframes gradShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+@keyframes btnShine{0%{left:-60%}55%,100%{left:130%}}
+@keyframes glowPulse{0%,100%{box-shadow:0 8px 18px rgba(255,106,43,.45)}50%{box-shadow:0 8px 26px rgba(255,106,43,.85)}}
+@keyframes springy{0%,100%{transform:translateY(-2px) scale(1.12)}50%{transform:translateY(-5px) scale(1.22)}}
+@keyframes pillPulse{0%,100%{box-shadow:0 0 0 0 rgba(251,191,36,.45)}50%{box-shadow:0 0 0 5px rgba(251,191,36,0)}}
+@keyframes twinkle{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(.82)}}
+@keyframes floatUpDots{0%{transform:translateY(0) scale(1);opacity:.5}100%{transform:translateY(-120px) scale(.4);opacity:0}}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes popIn{0%{opacity:0;transform:translateY(14px) scale(.96)}100%{opacity:1;transform:none}}
+
+/* animated, gently shifting gradients on the big colour panels */
+.heroTop,.homeHero,.earnhero{background-size:200% 200%;animation:gradShift 14s ease infinite}
+.heroTop{animation:gradShift 16s ease infinite}
+
+/* app logo + paywall crown: pop in, then keep floating */
+.applogo{animation:logoPop 1s cubic-bezier(.2,1.6,.4,1) both,floaty 3.6s ease-in-out 1.05s infinite}
+.pwIcon{animation:logoPop .7s both,floaty 4s ease-in-out 1s infinite}
+
+/* sweeping glare across every primary button */
+.btn{isolation:isolate}
+.btn::before{content:"";position:absolute;top:0;left:-60%;width:45%;height:100%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.38),transparent);transform:skewX(-20deg);animation:btnShine 3.4s ease-in-out infinite;pointer-events:none;z-index:0}
+.btn.ghost::before{background:linear-gradient(120deg,transparent,rgba(255,255,255,.14),transparent)}
+
+/* springy bounce on the active tab icon */
+/* bottom pill bar: every icon gently floats (staggered), active one springs, hover bounces */
+@keyframes tabFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes tabBounce{0%{transform:translateY(0)}35%{transform:translateY(-7px)}70%{transform:translateY(-2px)}100%{transform:translateY(0)}}
+.tab .tic{animation:tabFloat 3.2s ease-in-out infinite}
+.tab:nth-child(1) .tic{animation-delay:0s}
+.tab:nth-child(2) .tic{animation-delay:.22s}
+.tab:nth-child(3) .tic{animation-delay:.44s}
+.tab:nth-child(4) .tic{animation-delay:.66s}
+.tab:nth-child(5) .tic{animation-delay:.88s}
+.tab.active{animation:popIn .35s both}
+.tab.active .tic{animation:springy 1.5s ease-in-out infinite}
+.tab:not(.active):hover .tic{animation:tabBounce .55s ease}
+
+/* list-row icons tilt on hover */
+.lrow .lic{transition:transform .3s,background .25s}
+.lrow:hover .lic{transform:rotate(-8deg) scale(1.12);background:var(--orange)}
+.lrow:hover .lic .ico{color:#fff}
+
+/* stat / owner tiles: icon springs on hover */
+.scard .sic,.ostat .oic,.payrow .pic2{transition:transform .3s}
+.scard:hover .sic,.ostat:hover .oic,.payrow:hover .pic2{transform:scale(1.15) rotate(-6deg)}
+
+/* map pins glow + rating stars twinkle */
+.pin .head{animation:glowPulse 2.2s ease-in-out infinite}
+.ratep{display:inline-block;animation:twinkle 2.6s ease-in-out infinite}
+
+/* pending status pills softly pulse for attention */
+.statuspill.pending{animation:pillPulse 1.9s ease-in-out infinite}
+
+/* selected payment / slot chips pop and glow */
+.pm.sel{animation:popIn .35s both,glowPulse 2.4s ease-in-out .35s infinite}
+.slot.sel{animation:popIn .3s both}
+.chip.active{animation:popIn .3s both}
+
+/* subscription ring gently breathes */
+.ringy{animation:breathe 3s ease-in-out infinite}
+
+/* floating dots rising inside the onboarding hero */
+.heroTop .lines::before,.heroTop .lines::after{content:"";position:absolute;bottom:20px;width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.45);animation:floatUpDots 5s ease-in infinite}
+.heroTop .lines::before{left:24%;animation-delay:.4s}
+.heroTop .lines::after{left:70%;animation-delay:2.2s;width:7px;height:7px}
+
+/* paywall feature rows stagger in */
+.pwFeat li{animation:popIn .5s both}
+.pwFeat li:nth-child(1){animation-delay:.15s}
+.pwFeat li:nth-child(2){animation-delay:.28s}
+.pwFeat li:nth-child(3){animation-delay:.41s}
+
+/* gentle hover zoom on cards' pitch art */
+.fcard .pitch,.mini-card .pitch{transition:transform .5s cubic-bezier(.2,1,.4,1)}
+.fcard:hover .pitch,.mini-card:hover .pitch{transform:scale(1.06)}
+
+@media(prefers-reduced-motion:reduce){
+ *{animation-duration:.001ms!important;animation-iteration-count:1!important}
+}
+
+/* ===== new feature styles (admin, booking detail, entry code, chat) ===== */
+.admin-input{width:100%;background:var(--card);border:1px solid var(--stroke2);border-radius:14px;padding:16px;color:var(--txt);font-size:1.4rem;letter-spacing:.4em;text-align:center;outline:none}
+.admin-input:focus{border-color:var(--orange)}
+.statuspill.awaiting_payment{background:rgba(59,130,246,.14);color:#7ab3ff;border:1px solid rgba(59,130,246,.35)}
+.statuspill.pending_verification{background:rgba(251,191,36,.13);color:var(--gold);border:1px solid rgba(251,191,36,.35)}
+.statuspill.checked_in{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.35)}
+.bd-summary{list-style:none;display:flex;flex-direction:column;gap:2px;background:var(--card);border:1px solid var(--stroke);border-radius:16px;padding:6px 14px;margin:10px 0}
+.bd-summary li{display:flex;justify-content:space-between;padding:8px 0;font-size:.92rem}
+.bd-summary li span{color:var(--muted)}
+.bd-sec{background:var(--card);border:1px solid var(--stroke);border-radius:16px;padding:14px;margin:12px 0}
+.bd-sec h4{font-size:.95rem;margin-bottom:10px}
+.bd-err{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);color:#ffb3b3;border-radius:13px;padding:11px 13px;font-size:.85rem;margin:10px 0}
+.bd-ok{color:var(--green);font-size:.85rem;margin-top:6px}
+.bd-ack{display:flex;gap:10px;align-items:flex-start;font-size:.9rem;cursor:pointer;margin:4px 0 10px}
+.bd-ack input{width:20px;height:20px;accent-color:var(--orange);flex-shrink:0;margin-top:1px}
+.entry-code-big{text-align:center;background:linear-gradient(135deg,#162a4d,#13223d);border:1px solid rgba(59,130,246,.3);border-radius:18px;padding:18px;margin-top:8px}
+.entry-code-big .digits{font-size:2.6rem;font-weight:900;letter-spacing:.32em;color:#fff;animation:popIn .4s both}
+.entry-code-big .lab{color:var(--muted);font-size:.74rem;font-weight:800;letter-spacing:1.5px}
+.bd-code-input{width:100%;text-align:center;font-size:1.8rem;letter-spacing:.4em;padding:12px;border-radius:13px;border:1px solid var(--stroke2);background:var(--bg);color:var(--txt);outline:none}
+.bd-code-input:focus{border-color:var(--orange)}
+.bd-code-input:disabled{opacity:.5}
+.bd-proof{width:100%;max-height:240px;object-fit:contain;border-radius:13px;border:1px solid var(--stroke2);margin-top:8px}
+.bd-progress{display:flex;gap:6px;margin:6px 0 12px}
+.bd-progress i{flex:1;height:4px;border-radius:2px;background:var(--stroke2)}
+.bd-progress i.on{background:var(--orange)}
+.bd-chat{display:flex;flex-direction:column;gap:7px;max-height:34vh;overflow-y:auto;padding:4px 0}
+.bd-chat .cmsg{max-width:82%;padding:9px 13px;border-radius:15px;font-size:.88rem;line-height:1.4;animation:cardIn .3s both;word-break:break-word}
+.bd-chat .cmsg.me{align-self:flex-end;background:linear-gradient(120deg,var(--orange),var(--orange2));border-bottom-right-radius:4px}
+.bd-chat .cmsg.them{align-self:flex-start;background:var(--card2);border:1px solid var(--stroke2);border-bottom-left-radius:4px}
+.bd-inprogress{text-align:center;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.35);border-radius:16px;padding:18px;margin-top:8px}
+.bd-inprogress .badge{display:inline-block;background:var(--green);color:#04210f;font-weight:800;font-size:.8rem;padding:5px 13px;border-radius:999px;animation:pillPulse 1.8s infinite}
+.acctbox{display:flex;align-items:center;gap:8px;background:var(--card2);border:1px solid var(--stroke2);border-radius:13px;padding:10px 12px}
+.acctbox span{flex:1;font-weight:800;word-break:break-all;font-size:.95rem;letter-spacing:.3px}
+/* darker line icons everywhere (currentColor-based) */
+.ico{color:#46506a}
+.btn .ico,.bell .ico,.aiFab .ico,.pin .head .ico,.pwIcon .ico,.pm .chk .ico,.admAv .ico{color:#fff}
+.tab .tic .ico,.lockbadge .ico,.ratep .ico,.statuspill .ico{color:inherit}
+/* ===== polish: hero, logo, headings, cards ===== */
+.applogo .ballLogo{width:62%;height:62%;display:block}
+.applogo{box-shadow:0 18px 44px rgba(0,0,0,.42),0 0 0 10px rgba(255,255,255,.16)}
+.heroTop::after{content:"";position:absolute;left:50%;top:33%;width:340px;height:340px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.30),rgba(255,255,255,0) 62%);pointer-events:none;z-index:0}
+.heroTop .applogo,.heroTop h1,.heroTop p{position:relative;z-index:1}
+.heroTop h1{text-shadow:0 4px 20px rgba(0,0,0,.3);letter-spacing:.4px}
+.heroTop p{text-shadow:0 2px 10px rgba(0,0,0,.22)}
+/* gentle accent + lift on key cards */
+.secHead h2{position:relative;padding-left:13px}
+.secHead h2::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);width:5px;height:20px;border-radius:3px;background:linear-gradient(180deg,var(--orange),var(--orange2))}
+.fcard,.mini-card{box-shadow:0 6px 18px rgba(0,0,0,.28)}
+.rolecard{box-shadow:0 8px 22px rgba(0,0,0,.22)}
+.btn{letter-spacing:.2px}
+/* reviews */
+.starpick{display:flex;gap:8px;font-size:1.9rem;color:var(--gold);line-height:1}
+.starpick .rstar{cursor:pointer;transition:transform .15s}
+.starpick .rstar:hover{transform:scale(1.18)}
+.review{background:var(--card);border:1px solid var(--stroke);border-radius:14px;padding:12px 14px;margin-bottom:10px;animation:cardIn .35s both}
+.review .rstars{color:var(--gold);letter-spacing:1px;font-size:.9rem}
+.pitch.img{background-size:cover;background-position:center}
+.themeBtn{background:none;border:none;color:var(--orange);cursor:pointer;display:flex;align-items:center;padding:4px;transition:transform .25s}
+.themeBtn:hover{transform:rotate(18deg) scale(1.12)}
+/* ===== LIGHT MODE ===== */
+body.light{--bg:#eef1f8;--bg2:#e3e9f3;--card:#ffffff;--card2:#eef2f8;--stroke:rgba(15,23,42,.08);--stroke2:rgba(15,23,42,.14);--txt:#16213a;--muted:#5d6b85;background:#dde3ee}
+body.light #phone{box-shadow:0 0 60px rgba(31,45,80,.16)}
+body.light #tabbar{background:rgba(255,255,255,.9);border-color:var(--stroke2);box-shadow:0 12px 30px rgba(31,45,80,.16)}
+body.light .searchbar{background:rgba(255,255,255,.94);box-shadow:inset 0 0 0 1px rgba(15,23,42,.06)}
+body.light .searchbar input,body.light .searchbar span{color:#16213a}
+body.light .toast{background:rgba(255,255,255,.97);color:#16213a;box-shadow:0 14px 34px rgba(31,45,80,.18)}
+body.light .msg.ai{background:#fff}
+body.light .ringy>div{background:#fff}
+body.light .mapbox{background:linear-gradient(140deg,#eef2f9,#e2e9f4)}
+body.light .admin-input,body.light .bd-code-input{background:#fff}
+body.light .notice{background:rgba(255,138,61,.12)}
+/* ===== responsive: phone -> foldable -> tablet -> laptop ===== */
+@media(min-width:740px){
+ #phone{max-width:920px;margin:20px auto;min-height:calc(100vh - 40px);border-radius:30px}
+ /* browse lists flow into responsive columns */
+ #exList,#recList{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;padding:4px 18px 8px}
+ #exList .fcard,#recList .fcard{margin:0}
+ #bkList,#rsList{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px;padding:4px 18px}
+ #bkList .bkcard,#rsList .bkcard{margin:0}
+ .ostatgrid{grid-template-columns:repeat(4,1fr)}
+ /* roomier sheets/overlays on big screens */
+ .sheet{max-width:560px;border-radius:28px}
+ .overlay{align-items:center}
+ .sheet{border-bottom-left-radius:28px;border-bottom-right-radius:28px}
+}
+@media(min-width:1100px){
+ #phone{max-width:1160px}
+ #exList,#recList{grid-template-columns:repeat(auto-fill,minmax(340px,1fr))}
+ #bkList,#rsList{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+<body>
+<div id="phone">
+
+<!-- ============ ONBOARDING ============ -->
+<section class="screen noTab on" id="scr-onboard">
+  <div class="heroTop">
+    <div class="lines"></div>
+    <div class="applogo" id="secretLogo"><svg class="ballLogo" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><g stroke="#16203a" stroke-width="2.6" stroke-linecap="round" fill="none"><line x1="32" y1="23" x2="32" y2="6.5"/><line x1="40.6" y1="29.2" x2="56.6" y2="24"/><line x1="37.3" y1="39.3" x2="47.2" y2="53"/><line x1="26.7" y1="39.3" x2="16.8" y2="53"/><line x1="23.4" y1="29.2" x2="7.4" y2="24"/></g><polygon points="32,23 40.6,29.2 37.3,39.3 26.7,39.3 23.4,29.2" fill="#16203a"/></svg></div>
+    <h1>YallaEl3ab</h1>
+    <p>The fastest way to book a pitch</p>
+  </div>
+  <div class="pad">
+    <h1 style="margin-top:8px">How will you play?</h1>
+    <p class="muted" style="margin:6px 0 18px">Choose your mode. You can switch anytime from settings.</p>
+    <div class="rolecard" data-role="player" style="animation-delay:.1s" onclick="pickRole('player')">
+      <div class="ric"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M12 7l4 3-1.5 5h-5L8 10z'/></svg></span></div>
+      <div><b>I'm a Player</b><span>Find and book football fields</span></div>
+      <div class="radio"></div>
+    </div>
+    <div style="height:14px"></div>
+    <div class="rolecard" data-role="owner" style="animation-delay:.2s" onclick="pickRole('owner')">
+      <div class="ric"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='5' y='3' width='14' height='18' rx='1'/><path d='M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2'/></svg></span></div>
+      <div><b>I'm an Owner</b><span>List my fields and manage bookings</span></div>
+      <div class="radio"></div>
+    </div>
+    <div style="height:30px"></div>
+    <button class="btn" id="contBtn" style="width:100%" disabled onclick="goSignup()">→ &nbsp;Continue</button>
+    <div class="linkline">Already have an account? <a onclick="show('scr-login')">Log in</a></div>
+  </div>
+</section>
+
+<!-- ============ SIGNUP ============ -->
+<section class="screen noTab" id="scr-signup">
+  <div class="pad">
+    <button class="backbtn" onclick="show('scr-onboard')">‹</button>
+    <div style="width:60px;height:60px;border-radius:18px;background:linear-gradient(135deg,var(--orange),var(--orange2));display:grid;place-items:center;font-size:1.7rem;margin:22px 0 16px;animation:logoPop .6s both"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M12 7l4 3-1.5 5h-5L8 10z'/></svg></span></div>
+    <h1>Let's get you started</h1>
+    <p class="muted" style="margin:6px 0 22px">Joining as a <b id="suRole" style="color:var(--orange)">Player</b></p>
+    <div class="field"><label>Full name</label><div class="inwrap"><span class="ic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='8' r='4'/><path d='M5 21c0-4 3.5-6 7-6s7 2 7 6'/></svg></span></span><input id="suName" placeholder="Ahmed Mahmoud"></div></div>
+    <div class="field"><label>Email</label><div class="inwrap"><span class="ic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='5' width='18' height='14' rx='2'/><path d='M4 7l8 6 8-6'/></svg></span></span><input id="suEmail" type="email" placeholder="you@email.com"></div></div>
+    <div class="field"><label>Password</label><div class="inwrap"><span class="ic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='5' y='11' width='14' height='9' rx='2'/><path d='M8 11V8a4 4 0 0 1 8 0v3'/></svg></span></span><input id="suPass" type="password" placeholder="At least 4 characters"></div></div>
+    <div class="field"><label>InstaPay wallet or bank account</label><div class="inwrap"><span class="ic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='6' width='18' height='12' rx='2'/><circle cx='12' cy='12' r='2.5'/></svg></span></span><input id="suIpa" placeholder="name@instapay or account / IBAN"></div></div>
+    <p class="muted" style="font-size:.78rem;margin:-6px 0 6px">Used to send payments (player) and receive them (owner). You can change it later in your profile.</p>
+    <div style="height:8px"></div>
+    <button class="btn" style="width:100%" onclick="doSignup()">Create account</button>
+    <p class="muted" style="text-align:center;font-size:.8rem;margin-top:14px">By continuing you agree to our <span style="color:var(--orange)">Terms</span> and <span style="color:var(--orange)">Privacy Policy</span>.</p>
+    <div class="linkline">Already have an account? <a onclick="show('scr-login')">Log in</a></div>
+  </div>
+</section>
+
+<!-- ============ LOGIN ============ -->
+<section class="screen noTab" id="scr-login">
+  <div class="pad">
+    <button class="backbtn" onclick="show('scr-onboard')">‹</button>
+    <div style="width:60px;height:60px;border-radius:18px;background:linear-gradient(135deg,var(--orange),var(--orange2));display:grid;place-items:center;font-size:1.7rem;margin:22px 0 16px;animation:logoPop .6s both"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M12 7l4 3-1.5 5h-5L8 10z'/></svg></span></div>
+    <h1>Welcome back</h1>
+    <p class="muted" style="margin:6px 0 22px">Log in to keep playing.</p>
+    <div class="field"><label>Email</label><div class="inwrap"><span class="ic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='5' width='18' height='14' rx='2'/><path d='M4 7l8 6 8-6'/></svg></span></span><input id="liEmail" type="email" placeholder="you@email.com"></div></div>
+    <div class="field"><label>Password</label><div class="inwrap"><span class="ic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='5' y='11' width='14' height='9' rx='2'/><path d='M8 11V8a4 4 0 0 1 8 0v3'/></svg></span></span><input id="liPass" type="password" placeholder="••••••••"></div></div>
+    <div style="height:8px"></div>
+    <button class="btn" style="width:100%" onclick="doLogin()">Log in</button>
+    <div class="linkline"><a onclick="openForgot()">Forgot password?</a></div>
+    <div class="linkline">New here? <a onclick="show('scr-onboard')">Create an account</a></div>
+  </div>
+</section>
+
+<!-- ============ OWNER FIRST FIELD SETUP ============ -->
+<section class="screen noTab" id="scr-setup">
+  <div class="pad" style="text-align:center">
+    <div style="width:74px;height:74px;border-radius:22px;background:rgba(255,106,43,.15);display:grid;place-items:center;font-size:2rem;margin:36px auto 18px;animation:logoPop .6s both"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 9h16M4 9l1-5h14l1 5M5 9v11h14V9M9 20v-5h6v5'/></svg></span></div>
+    <h1>Set up your first field</h1>
+    <p class="muted" style="margin:10px 0 24px">Tell players about your pitch so they can find and book it. Takes less than a minute.</p>
+  </div>
+  <div style="padding:0 18px;text-align:left">
+    <div class="field"><label>Field name</label><div class="inwrap"><span class="ic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><ellipse cx='12' cy='12' rx='9' ry='6'/><path d='M7 12a5 3 0 0 1 10 0'/></svg></span></span><input id="sfName" placeholder="e.g. Star Stadium, Cairo"></div></div>
+    <div class="field"><label>City / Location</label><div class="inwrap"><span class="ic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z'/><circle cx='12' cy='10' r='2.5'/></svg></span></span><input id="sfCity" placeholder="e.g. New Cairo, Giza"></div></div>
+    <div class="field"><label>Price per hour (EGP)</label><div class="inwrap"><span class="ic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='6' width='18' height='12' rx='2'/><circle cx='12' cy='12' r='2.5'/></svg></span></span><input id="sfPrice" type="number" placeholder="e.g. 500"><b class="muted" style="font-size:.85rem">EGP</b></div></div>
+    <div class="field"><label>Pitch size</label><div class="inwrap"><span class="ic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 16L16 4l4 4L8 20z'/><path d='M9 9l2 2M12 6l2 2M6 12l2 2'/></svg></span></span><select id="sfSize"><option value="5">5-a-side</option><option value="7" selected>7-a-side</option><option value="11">11-a-side</option></select></div></div>
+    <div class="notice"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='#fbbf24' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3l9 16H3z'/><path d='M12 9v5M12 17h.01'/></svg></span> You can add photos, amenities and more details after setup from the My Fields tab.</div>
+    <div style="height:18px"></div>
+    <button class="btn" style="width:100%" onclick="completeSetup()"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12l5 5 9-11'/></svg></span> &nbsp;Complete setup</button>
+    <div class="linkline"><a onclick="skipSetup()" style="color:var(--muted)">Skip for now</a></div>
+  </div>
+</section>
+
+<!-- ============ MEMBERSHIP PAYWALL (required for everyone) ============ -->
+<section class="screen noTab" id="scr-paywall">
+  <div class="pad" style="text-align:center">
+    <div class="pwIcon"><span class="ico"><svg viewBox='0 0 24 24' fill='currentColor'><path d='M3 8l4.5 4L12 4l4.5 8L21 8l-2 11H5z'/></svg></span></div>
+    <h1>Unlock YallaEl3ab</h1>
+    <p class="muted" style="margin:8px 0 0">Hi <b id="pwName" style="color:var(--orange)"></b>, a membership is required to use the app.</p>
+  </div>
+  <div class="subcard" style="margin-top:16px">
+    <div class="row"><div><span class="muted" style="font-size:.76rem;font-weight:800;letter-spacing:1.4px">MEMBERSHIP</span>
+    <div class="price">50 <small>EGP / month</small></div></div>
+    <div class="spacer"></div><span class="statuspill pending">required</span></div>
+    <ul class="pwFeat">
+      <li><span class="ico"><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12l5 5 9-11'/></svg></span> Book unlimited pitches</li>
+      <li><span class="ico"><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12l5 5 9-11'/></svg></span> Live map &amp; AI pitch finder</li>
+      <li><span class="ico"><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12l5 5 9-11'/></svg></span> Instant booking confirmations</li>
+    </ul>
+  </div>
+  <div style="padding:0 18px">
+    <button class="btn trialbtn" id="pwTrialBtn" style="width:100%" onclick="startTrial()"></button>
+    <div class="pwOr"><span>or pay now</span></div>
+    <div class="field"><label>Pay with</label><div class="pmgrid" id="pwPays"></div></div>
+    <div id="pwExtra"></div>
+    <div style="height:14px"></div>
+    <button class="btn" id="pwBtn" style="width:100%" onclick="payAccess()"></button>
+    <p class="muted" style="text-align:center;font-size:.78rem;margin-top:12px">Free for 14 days, then 50 EGP/month. Cancel anytime.</p>
+    <div class="linkline"><a onclick="logout()" style="color:var(--muted)">Log out</a></div>
+  </div>
+</section>
+
+<!-- ============ PLAYER: HOME ============ -->
+<section class="screen" id="scr-home">
+  <div class="homeHero">
+    <div class="row">
+      <div>
+        <b id="phGreet" style="font-size:1.05rem">Yalla, Player</b>
+        <div style="font-size:.82rem;opacity:.9"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z'/><circle cx='12' cy='10' r='2.5'/></svg></span> Cairo, Egypt</div>
+      </div>
+      <div class="spacer"></div>
+      <button class="bell" onclick="openNotifs()"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6z'/><path d='M10 20a2 2 0 0 0 4 0'/></svg></span><span class="nd" id="notifDot" style="display:none"></span></button>
+    </div>
+    <h1>Find your<br>perfect pitch.</h1>
+    <div class="searchbar"><span><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='6'/><path d='M20 20l-4-4'/></svg></span></span><input id="homeSearch" placeholder="Search fields, areas, or vibes..." oninput="syncSearch(this.value)"><button class="themeBtn" id="themeBtn" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button></div>
+  </div>
+  <div class="chiprow" id="homeChips"></div>
+  <div class="secHead"><h2>Top Rated</h2><a onclick="goTab('explore')">See all ›</a></div>
+  <div class="hscroll" id="topRated"></div>
+  <div class="secHead"><h2>Recommended For You</h2><a onclick="goTab('explore')">See all ›</a></div>
+  <div id="recList"></div>
+</section>
+
+<!-- ============ PLAYER: EXPLORE ============ -->
+<section class="screen" id="scr-explore">
+  <div class="pad"><h1>Explore</h1></div>
+  <div style="display:flex;gap:10px;padding:14px 18px 0">
+    <div class="inwrap" style="flex:1"><span class="ic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='6'/><path d='M20 20l-4-4'/></svg></span></span><input id="exSearch" placeholder="Search fields, cities..." oninput="syncSearch(this.value)"></div>
+    <button class="backbtn" style="border-radius:15px;width:50px;height:50px"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='3'/><path d='M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2'/></svg></span></button>
+  </div>
+  <div class="chiprow" id="exChips"></div>
+  <div class="row" style="padding:6px 18px 10px"><span class="muted" id="exCount" style="font-size:.88rem"></span><div class="spacer"></div><a style="color:var(--orange);font-weight:700;font-size:.88rem;cursor:pointer" onclick="goTab('map')"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z'/><path d='M9 4v14M15 6v14'/></svg></span> Map view</a></div>
+  <div id="exList"></div>
+</section>
+
+<!-- ============ PLAYER: MAP ============ -->
+<section class="screen" id="scr-map">
+  <div class="pad"><h1>Nearby fields</h1><p class="muted" style="margin-top:5px"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z'/><circle cx='12' cy='10' r='2.5'/></svg></span> Across Cairo, Giza & Riyadh</p></div>
+  <div class="mapbox"><div class="grid"></div><div id="pins"></div>
+    <div style="position:absolute;right:12px;bottom:12px;background:rgba(13,19,32,.85);border:1px solid var(--stroke2);border-radius:11px;padding:8px 13px;font-size:.78rem;color:var(--muted)"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='7' y='3' width='10' height='18' rx='2'/><path d='M11 18h2'/></svg></span> Live map on mobile</div>
+  </div>
+  <div id="mapList"></div>
+</section>
+
+<!-- ============ PLAYER: BOOKINGS ============ -->
+<section class="screen" id="scr-bookings">
+  <div class="pad"><h1>My Bookings</h1></div>
+  <div class="tabs2" id="bkTabs">
+    <button class="t2 active" data-f="upcoming" onclick="setBkTab('upcoming')">Upcoming</button>
+    <button class="t2" data-f="past" onclick="setBkTab('past')">Past</button>
+    <button class="t2" data-f="cancelled" onclick="setBkTab('cancelled')">Cancelled</button>
+  </div>
+  <div id="bkList"></div>
+</section>
+
+<!-- ============ PLAYER: PROFILE ============ -->
+<section class="screen" id="scr-profile"></section>
+
+<!-- ============ OWNER: DASHBOARD ============ -->
+<section class="screen" id="scr-dash"></section>
+
+<!-- ============ OWNER: MY FIELDS ============ -->
+<section class="screen" id="scr-myfields"></section>
+
+<!-- ============ OWNER: EARNINGS ============ -->
+<section class="screen" id="scr-earnings"></section>
+
+<!-- ============ OWNER: RESERVATIONS ============ -->
+<section class="screen" id="scr-reserv">
+  <div class="pad"><h1>Reservations</h1></div>
+  <div class="tabs2">
+    <button class="t2 active" data-f="pending" onclick="setRsTab('pending')">Pending</button>
+    <button class="t2" data-f="confirmed" onclick="setRsTab('confirmed')">Confirmed</button>
+    <button class="t2" data-f="past" onclick="setRsTab('past')">Past</button>
+  </div>
+  <div id="rsList"></div>
+</section>
+
+<!-- ============ OWNER: SETTINGS ============ -->
+<section class="screen" id="scr-settings"></section>
+
+<!-- tab bar -->
+<nav id="tabbar"></nav>
+
+<!-- ============ SHEETS ============ -->
+<div class="overlay" id="ovBook"><div class="sheet">
+  <div class="grab"></div>
+  <h2 id="bkTitle"></h2><p class="muted" id="bkSub" style="margin:4px 0 16px;font-size:.88rem"></p>
+  <div class="field"><label>Date</label><div class="inwrap"><span class="ic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='5' width='16' height='16' rx='2'/><path d='M4 9h16M8 3v4M16 3v4'/></svg></span></span><input type="date" id="bkDate"></div></div>
+  <div class="field"><label>Time slot (1 hour)</label><div class="slotgrid" id="bkSlots"></div></div>
+  <div class="field"><label>Payment method</label><div class="pmgrid" id="bkPays"></div></div>
+  <div id="pmExtra"></div>
+  <div class="summary" id="bkSummary"></div>
+  <div style="height:14px"></div>
+  <button class="btn" style="width:100%" id="bkConfirm" onclick="confirmBooking()"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M12 7l4 3-1.5 5h-5L8 10z'/></svg></span> Confirm booking</button>
+</div></div>
+
+<div class="overlay" id="ovSub"><div class="sheet">
+  <div class="grab"></div>
+  <h2><span class='ico'><svg viewBox='0 0 24 24' fill='currentColor'><path d='M3 8l4.5 4L12 4l4.5 8L21 8l-2 11H5z'/></svg></span> Owner Subscription</h2>
+  <p class="muted" style="margin:6px 0 14px;font-size:.9rem">Keep your fields visible & accept bookings.</p>
+  <div class="summary"><div class="srow"><span>Plan</span><b>YallaEl3ab Owner Pro</b></div><div class="srow"><span>Billing</span><b>Monthly</b></div><div class="srow tot"><span>Total</span><b style="color:var(--orange)">50 EGP / month</b></div></div>
+  <div style="height:14px"></div>
+  <div class="field"><label>Pay with</label><div class="pmgrid" id="subPays"></div></div>
+  <div id="subPmExtra"></div>
+  <div style="height:10px"></div>
+  <button class="btn" style="width:100%" id="subPayBtn" onclick="paySubscription()"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='5' width='18' height='14' rx='2'/><path d='M3 10h18'/></svg></span> Pay 50 EGP</button>
+</div></div>
+
+<div class="overlay" id="ovAddField"><div class="sheet">
+  <div class="grab"></div>
+  <h2><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 5v14M5 12h14'/></svg></span> Add a field</h2><div style="height:12px"></div>
+  <div class="field"><label>Field name</label><div class="inwrap"><span class="ic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><ellipse cx='12' cy='12' rx='9' ry='6'/><path d='M7 12a5 3 0 0 1 10 0'/></svg></span></span><input id="afName" placeholder="e.g. Star Stadium"></div></div>
+  <div class="field"><label>City</label><div class="inwrap"><span class="ic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z'/><circle cx='12' cy='10' r='2.5'/></svg></span></span><input id="afCity" placeholder="e.g. Cairo"></div></div>
+  <div class="field"><label>Price/hr (EGP)</label><div class="inwrap"><span class="ic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='6' width='18' height='12' rx='2'/><circle cx='12' cy='12' r='2.5'/></svg></span></span><input id="afPrice" type="number" placeholder="e.g. 400"></div></div>
+  <div class="field"><label>Size</label><div class="inwrap"><span class="ic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 16L16 4l4 4L8 20z'/><path d='M9 9l2 2M12 6l2 2M6 12l2 2'/></svg></span></span><select id="afSize"><option value="5">5-a-side</option><option value="7">7-a-side</option><option value="11">11-a-side</option></select></div></div>
+  <div class="field"><label>Photo (optional)</label><input type="file" accept="image/*" id="afImg" onchange="readFieldImg(this,'add')" style="font-size:.85rem;color:var(--muted)"></div>
+  <button class="btn" style="width:100%" onclick="addField()"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12l5 5 9-11'/></svg></span> Add field</button>
+</div></div>
+
+<div class="overlay" id="ovEditField"><div class="sheet">
+  <div class="grab"></div>
+  <h2>Edit field</h2><div style="height:12px"></div>
+  <div class="field"><label>Field name</label><div class="inwrap"><input id="efName"></div></div>
+  <div class="field"><label>City</label><div class="inwrap"><input id="efCity"></div></div>
+  <div class="field"><label>Price/hr (EGP)</label><div class="inwrap"><input id="efPrice" type="number"></div></div>
+  <div class="field"><label>Size</label><div class="inwrap"><select id="efSize"><option value="5">5-a-side</option><option value="7">7-a-side</option><option value="11">11-a-side</option></select></div></div>
+  <div class="field"><label>Photo (optional — replaces current)</label><input type="file" accept="image/*" id="efImg" onchange="readFieldImg(this,'edit')" style="font-size:.85rem;color:var(--muted)"></div>
+  <button class="btn" style="width:100%" onclick="saveEditField()">Save changes</button>
+</div></div>
+
+<div class="overlay" id="ovReviews"><div class="sheet"><div class="grab"></div><div id="revBody"></div></div></div>
+
+<div class="overlay" id="ovNotif"><div class="sheet">
+  <div class="grab"></div><h2><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6z'/><path d='M10 20a2 2 0 0 0 4 0'/></svg></span> Notifications</h2><div id="notifList" style="margin-top:14px"></div>
+</div></div>
+
+<div class="overlay" id="ovAI"><div class="sheet">
+  <div class="grab"></div>
+  <div class="row"><h2><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='5' y='8' width='14' height='11' rx='2'/><path d='M9 13h.01M15 13h.01M9 16h6M12 5v3'/><circle cx='12' cy='4' r='1'/></svg></span> Pitch Finder AI</h2><div class="spacer"></div><button class="btn ghost sm" onclick="openAiKey()">AI key</button></div>
+  <div id="aiMsgs" style="margin-top:12px"></div>
+  <div class="row" style="margin-top:8px"><div class="inwrap" style="flex:1"><input id="aiInput" placeholder="e.g. cheap 7-a-side tonight…" onkeydown="if(event.key==='Enter')aiSend()"></div><button class="btn sm" onclick="aiSend()"><span class='ico'><svg viewBox='0 0 24 24' fill='currentColor'><path d='M3 11l18-8-8 18-2-7z'/></svg></span></button></div>
+</div></div>
+
+<div class="overlay" id="ovAdmin"><div class="sheet" id="adminSheet">
+  <div class="grab"></div><div id="adminBody"></div>
+</div></div>
+
+<!-- Feature 1: blank admin password (no labels, no hints, no errors) -->
+<div class="overlay" id="ovAdminPass"><div class="sheet" style="padding-bottom:34px">
+  <div class="grab"></div>
+  <form id="admPassForm" autocomplete="off"><input id="admPassInput" type="password" class="admin-input" autocomplete="off" spellcheck="false"></form>
+</div></div>
+
+<!-- Double-sided booking detail: InstaPay verify, entry code, pre-flight, chat -->
+<div class="overlay" id="ovBookingDetail"><div class="sheet"><div class="grab"></div><div id="bdBody"></div></div></div>
+
+<!-- InstaPay address capture (profile setup) -->
+<div class="overlay" id="ovIpa"><div class="sheet" style="padding-bottom:30px">
+  <div class="grab"></div>
+  <h2>InstaPay address</h2>
+  <p class="muted" style="margin:6px 0 12px;font-size:.88rem">Your IPA (e.g. name@instapay) or registered mobile. Used to send/receive payments.</p>
+  <div class="inwrap"><input id="ipaInput" placeholder="yourname@instapay"></div>
+  <div style="height:12px"></div>
+  <button class="btn" style="width:100%" onclick="saveIpa()">Save</button>
+</div></div>
+
+<div class="overlay" id="ovAiKey"><div class="sheet" style="padding-bottom:30px">
+  <div class="grab"></div>
+  <h2>Enable real AI</h2>
+  <p class="muted" style="margin:6px 0 12px;font-size:.86rem">Paste an Anthropic API key to power the assistant with a real model. Stored only on this device.</p>
+  <div class="inwrap"><input id="aiKeyInput" type="password" placeholder="sk-ant-..."></div>
+  <div style="height:12px"></div>
+  <button class="btn" style="width:100%" onclick="saveAiKey()">Save</button>
+</div></div>
+
+<div class="overlay" id="ovHaveIpa"><div class="sheet" style="padding-bottom:30px">
+  <div class="grab"></div>
+  <h2>Do you have InstaPay?</h2>
+  <p class="muted" style="margin:6px 0 14px;font-size:.9rem">YallaEl3ab uses InstaPay for all payments. Do you have an InstaPay wallet or bank account?</p>
+  <div class="row"><button class="btn green" style="flex:1" onclick="haveInstaPay(true)">Yes, I have it</button><button class="btn ghost" style="flex:1" onclick="haveInstaPay(false)">Not yet</button></div>
+</div></div>
+
+<div class="overlay" id="ovForgot"><div class="sheet" style="padding-bottom:30px">
+  <div class="grab"></div>
+  <h2>Reset password</h2>
+  <p class="muted" style="margin:6px 0 12px;font-size:.86rem">Enter your account email and a new password.</p>
+  <div class="field"><label>Email</label><div class="inwrap"><input id="fpEmail" type="email" placeholder="you@email.com"></div></div>
+  <div class="field"><label>New password</label><div class="inwrap"><input id="fpPass" type="password" placeholder="At least 4 characters"></div></div>
+  <button class="btn" style="width:100%" onclick="resetPass()">Update password</button>
+</div></div>
+
+<div class="overlay" id="ovReport"><div class="sheet" style="padding-bottom:30px">
+  <div class="grab"></div>
+  <h2>Report to admin</h2>
+  <p class="muted" style="margin:6px 0 12px;font-size:.86rem">Let the admin know if your pitch is occupied by someone unknown, or there's another problem.</p>
+  <div class="field"><label>Which pitch?</label><div class="inwrap"><select id="rpField"></select></div></div>
+  <div class="field"><label>Details</label><div class="inwrap"><input id="rpMsg" placeholder="My pitch is taken by someone unknown"></div></div>
+  <button class="btn red" style="width:100%" onclick="submitReport()">Send report</button>
+</div></div>
+
+<button class="aiFab" id="aiFab" onclick="openAI()"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='5' y='8' width='14' height='11' rx='2'/><path d='M9 13h.01M15 13h.01M9 16h6M12 5v3'/><circle cx='12' cy='4' r='1'/></svg></span></button>
+<div id="toasts"></div>
+</div>
+
+<script>
+/* ================= STORE ================= */
+const store={
+ get:(k,d)=>{try{const v=localStorage.getItem("ye_"+k);return v===null?d:JSON.parse(v)}catch(e){return d}},
+ set:(k,v)=>localStorage.setItem("ye_"+k,JSON.stringify(v))
+};
+const $=s=>document.querySelector(s);
+const ICON={ball:`<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M12 7l4 3-1.5 5h-5L8 10z'/></svg></span>`,ban:`<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='#ef4444' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M6 6l12 12'/></svg></span>`,brokenheart:`<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10z'/><path d='M12 7l-1.5 3 3 2-1.5 3'/></svg></span>`,card:`<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='5' width='18' height='14' rx='2'/><path d='M3 10h18'/></svg></span>`,chartup:`<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 17l6-6 4 4 7-8'/><path d='M17 7h4v4'/></svg></span>`,chat:`<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 5h16v11H9l-5 4z'/></svg></span>`,checkc:`<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='#22c55e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M8 12l3 3 5-6'/></svg></span>`,clipboard:`<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='6' y='4' width='12' height='17' rx='2'/><path d='M9 4h6v3H9z'/></svg></span>`,crown:`<span class='ico'><svg viewBox='0 0 24 24' fill='currentColor'><path d='M3 8l4.5 4L12 4l4.5 8L21 8l-2 11H5z'/></svg></span>`,heartfill:`<span class='ico'><svg viewBox='0 0 24 24' fill='currentColor'><path d='M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10z'/></svg></span>`,party:`<span class='ico'><svg viewBox='0 0 24 24' fill='#fbbf24'><path d='M12 3l2.6 5.6 6 .8-4.4 4.2 1.1 6-5.3-2.9-5.3 2.9 1.1-6L3.4 9.4l6-.8z'/></svg></span>`,refresh:`<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M20 11A8 8 0 0 0 6 6L4 8M4 13a8 8 0 0 0 14 5l2-2'/><path d='M4 4v4h4M20 20v-4h-4'/></svg></span>`,stadium:`<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><ellipse cx='12' cy='12' rx='9' ry='6'/><path d='M7 12a5 3 0 0 1 10 0'/></svg></span>`,tools:`<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M15 7l3-3 2 2-3 3-2-2zM13 9L4 18l2 2 9-9M9 13l-3 3'/></svg></span>`,trash:`<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13'/></svg></span>`,warn:`<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='#fbbf24' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3l9 16H3z'/><path d='M12 9v5M12 17h.01'/></svg></span>`};
+
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+/* ================= DATA ================= */
+const SEED_FIELDS=[
+ {id:1,name:"Pyramids View Pitch",city:"Giza",area:"Al Haram Road, Giza",size:7,price:300,rating:4.9,reviews:210,turf:"Artificial turf",hours:"16:00 - 04:00",style:"v2 night",lat:.42,lng:.18,owner:"demo"},
+ {id:2,name:"Sheikh Zayed Football Hub",city:"Giza",area:"Hub 7, Sheikh Zayed City",size:5,price:320,rating:4.9,reviews:245,turf:"Artificial turf",hours:"10:00 - 02:00",style:"v3",lat:.3,lng:.34,owner:"demo"},
+ {id:3,name:"Nasr City Stadium",city:"Cairo",area:"Abbas El Akkad St",size:11,price:350,rating:4.8,reviews:124,turf:"Natural grass",hours:"08:00 - 23:00",style:"",lat:.62,lng:.55,owner:"demo"},
+ {id:4,name:"Downtown 5s Arena",city:"Cairo",area:"Tahrir Square, Downtown",size:5,price:150,rating:4.5,reviews:89,turf:"Indoor",hours:"07:00 - 00:00",style:"night",lat:.55,lng:.68,owner:"demo"},
+ {id:5,name:"Maadi Riverside Field",city:"Cairo",area:"Corniche El Maadi",size:7,price:280,rating:4.7,reviews:156,turf:"Artificial turf",hours:"09:00 - 01:00",style:"v2",lat:.72,lng:.45,owner:"demo"},
+ {id:6,name:"New Cairo Sports Park",city:"Cairo",area:"5th Settlement",size:11,price:400,rating:4.6,reviews:98,turf:"Natural grass",hours:"08:00 - 22:00",style:"v3 night",lat:.5,lng:.82,owner:"demo"},
+ {id:7,name:"Heliopolis Greens",city:"Cairo",area:"Korba, Heliopolis",size:7,price:260,rating:4.4,reviews:73,turf:"Artificial turf",hours:"10:00 - 02:00",style:"",lat:.38,lng:.6,owner:"demo"},
+ {id:8,name:"Zamalek Island Pitch",city:"Cairo",area:"Gezira Club Area",size:5,price:220,rating:4.6,reviews:140,turf:"Artificial turf",hours:"09:00 - 00:00",style:"v2",lat:.48,lng:.4,owner:"demo"},
+ {id:9,name:"Riyadh Premier Field",city:"Riyadh",area:"Al Olaya District",size:11,price:380,rating:4.8,reviews:201,turf:"Natural grass",hours:"14:00 - 02:00",style:"v3",lat:.25,lng:.7,owner:"demo"},
+ {id:10,name:"Riyadh 7s Club",city:"Riyadh",area:"Al Malaz",size:7,price:290,rating:4.5,reviews:88,turf:"Artificial turf",hours:"15:00 - 03:00",style:"night",lat:.2,lng:.5,owner:"demo"},
+ {id:11,name:"Giza Power League",city:"Giza",area:"Faisal St",size:5,price:170,rating:4.3,reviews:61,turf:"Artificial turf",hours:"08:00 - 02:00",style:"v2 night",lat:.66,lng:.25,owner:"demo"},
+ {id:12,name:"October Champions Arena",city:"Giza",area:"6th of October City",size:11,price:350,rating:4.9,reviews:178,turf:"Natural grass",hours:"08:00 - 23:00",style:"",lat:.78,lng:.62,owner:"demo"},
+ {id:13,name:"Tanta Champions Pitch",city:"Tanta",area:"El Geish St, Tanta",size:7,price:200,rating:4.7,reviews:64,turf:"Artificial turf",hours:"12:00 - 02:00",style:"v2",lat:.4,lng:.3,owner:"demo"},
+ {id:14,name:"Tanta Indoor 5s Arena",city:"Tanta",area:"Sigar, Tanta",size:5,price:160,rating:4.5,reviews:41,turf:"Indoor",hours:"10:00 - 00:00",style:"night",lat:.55,lng:.5,owner:"demo"},
+ {id:15,name:"El Mahalla Road Stadium",city:"Tanta",area:"El Bahr St, Tanta",size:11,price:280,rating:4.6,reviews:73,turf:"Natural grass",hours:"08:00 - 23:00",style:"v3",lat:.66,lng:.7,owner:"demo"},
+ {id:16,name:"Gharbia Stars Arena",city:"Tanta",area:"Saberi, Tanta, Gharbia",size:7,price:210,rating:4.7,reviews:58,turf:"Artificial turf",hours:"12:00 - 02:00",style:"v3 night",lat:.34,lng:.42,owner:"demo"},
+ {id:17,name:"El Mahalla Sporting Turf",city:"El Mahalla El Kubra",area:"Shoun Square, Gharbia",size:5,price:180,rating:4.6,reviews:96,turf:"Artificial turf",hours:"10:00 - 02:00",style:"v2",lat:.6,lng:.28,owner:"demo"},
+ {id:18,name:"Kafr El Zayat Pitch",city:"Kafr El Zayat",area:"Corniche, Gharbia",size:7,price:170,rating:4.4,reviews:47,turf:"Artificial turf",hours:"09:00 - 01:00",style:"v2 night",lat:.5,lng:.6,owner:"demo"},
+ {id:19,name:"Zifta Riverside Field",city:"Zifta",area:"Nile St, Gharbia",size:5,price:150,rating:4.3,reviews:39,turf:"Indoor",hours:"10:00 - 00:00",style:"night",lat:.72,lng:.5,owner:"demo"}
+];
+const PAYMENTS=[
+ {id:"visa",name:"Visa",logo:'<svg class="pay-svg" viewBox="0 0 92 28" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="vsh" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><mask id="vmask"><text x="46" y="22" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="900" font-style="italic" font-size="24" letter-spacing="1" fill="#fff">VISA</text></mask></defs><text x="46" y="22" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="900" font-style="italic" font-size="24" letter-spacing="1" fill="#1434CB">VISA</text><g mask="url(#vmask)"><rect x="-46" y="0" width="42" height="28" fill="url(#vsh)"><animate attributeName="x" from="-46" to="96" dur="2.6s" repeatCount="indefinite"/></rect></g></svg>',type:"card"},
+ {id:"mastercard",name:"Mastercard",logo:'<svg class="pay-svg" viewBox="0 0 54 34" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="mcL"><circle cx="20" cy="17" r="14"><animate attributeName="cx" values="20;22.5;20" dur="2.6s" repeatCount="indefinite"/></circle></clipPath></defs><circle cx="20" cy="17" r="14" fill="#EB001B"><animate attributeName="cx" values="20;22.5;20" dur="2.6s" repeatCount="indefinite"/></circle><circle cx="32" cy="17" r="14" fill="#F79E1B"><animate attributeName="cx" values="32;29.5;32" dur="2.6s" repeatCount="indefinite"/></circle><circle cx="32" cy="17" r="14" fill="#FF5F00" clip-path="url(#mcL)"><animate attributeName="cx" values="32;29.5;32" dur="2.6s" repeatCount="indefinite"/><animate attributeName="fill-opacity" values=".8;1;.8" dur="1.3s" repeatCount="indefinite"/></circle></svg>',type:"card"},
+ {id:"instapay",name:"InstaPay",logo:'<svg class="pay-svg" viewBox="0 0 122 28" xmlns="http://www.w3.org/2000/svg"><text x="0" y="21" font-family="Arial,Helvetica,sans-serif" font-weight="900" font-style="italic" font-size="18" fill="#4A1A7A">INSTA</text><g fill="none" stroke="#F26B21" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="55,8 61,15 55,22"><animate attributeName="opacity" values=".2;1;.2" dur="1.1s" repeatCount="indefinite"/></polyline><polyline points="63,8 69,15 63,22"><animate attributeName="opacity" values=".2;1;.2" dur="1.1s" begin=".22s" repeatCount="indefinite"/></polyline></g><text x="74" y="21" font-family="Arial,Helvetica,sans-serif" font-weight="900" font-style="italic" font-size="18" fill="#4A1A7A">PAY</text></svg>',type:"wallet"},
+ {id:"applepay",name:"Apple Pay",logo:'<svg class="pay-svg" viewBox="0 0 66 28" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="apsh" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".85"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><mask id="apm"><path d="M12.4 8.6c.7-.9 1.2-2 1-3.2-1 .05-2.2.66-2.95 1.5-.66.74-1.25 1.9-1.05 3 .12.01 2.3-.4 3-1.3z" fill="#fff"/><path d="M13.4 9.1c-1.6-.1-3 .9-3.8.9-.8 0-2-.85-3.3-.83-1.7.03-3.27.99-4.14 2.52-1.77 3.07-.45 7.62 1.27 10.12.84 1.22 1.84 2.6 3.15 2.55 1.26-.05 1.74-.82 3.27-.82 1.52 0 1.95.82 3.28.79 1.36-.02 2.22-1.24 3.05-2.47.96-1.41 1.36-2.78 1.38-2.85-.03-.01-2.65-1.02-2.68-4.04-.02-2.53 2.06-3.74 2.16-3.8-1.18-1.74-3.01-1.93-3.66-1.97z" fill="#fff"/><text x="24" y="21" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="18" fill="#fff">Pay</text></mask></defs><g><animateTransform attributeName="transform" type="scale" values="1;1.06;1" dur="2.4s" repeatCount="indefinite" additive="sum"/><path d="M12.4 8.6c.7-.9 1.2-2 1-3.2-1 .05-2.2.66-2.95 1.5-.66.74-1.25 1.9-1.05 3 .12.01 2.3-.4 3-1.3z" fill="#fff"/><path d="M13.4 9.1c-1.6-.1-3 .9-3.8.9-.8 0-2-.85-3.3-.83-1.7.03-3.27.99-4.14 2.52-1.77 3.07-.45 7.62 1.27 10.12.84 1.22 1.84 2.6 3.15 2.55 1.26-.05 1.74-.82 3.27-.82 1.52 0 1.95.82 3.28.79 1.36-.02 2.22-1.24 3.05-2.47.96-1.41 1.36-2.78 1.38-2.85-.03-.01-2.65-1.02-2.68-4.04-.02-2.53 2.06-3.74 2.16-3.8-1.18-1.74-3.01-1.93-3.66-1.97z" fill="#fff"/></g><text x="24" y="21" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="18" fill="#fff">Pay</text><g mask="url(#apm)"><rect x="-32" y="0" width="26" height="28" fill="url(#apsh)"><animate attributeName="x" from="-32" to="72" dur="2.8s" repeatCount="indefinite"/></rect></g></svg>',type:"native"}
+];
+const SUB_PRICE=50;
+const PLATFORM_IPA="+20 127 418 8441"; // InstaPay number that receives subscription payments
+
+/* state */
+let fields=store.get("fields",SEED_FIELDS);
+let users=store.get("users",[]);
+let bookings=store.get("bookings",[]);
+let favs=store.get("favs",[]);
+let notifs=store.get("notifs",[]);
+let session=store.get("session",null);
+let curFilter="All",curQuery="",bkTab="upcoming",rsTab="pending";
+let selField=null,selSlot=null,selPay=null,selSubPay=null,selAccessPay="instapay";
+let pickedRole=null;
+
+const me=()=>users.find(u=>u.email===session);
+const myFields=()=>fields.filter(f=>f.owner===session||f.owner==="demo"&&me()&&me().role==="owner");
+function saveAll(){store.set("fields",fields);store.set("users",users);store.set("bookings",bookings);store.set("favs",favs);store.set("notifs",notifs);store.set("session",session)}
+
+/* ================= UI helpers ================= */
+function toast(msg,ic=ICON.checkc){const t=document.createElement("div");t.className="toast";t.innerHTML=`<span>${ic}</span>${esc(msg)}`;$("#toasts").appendChild(t);setTimeout(()=>t.remove(),3700)}
+function confetti(){const cols=["#ff6a2b","#22c55e","#fbbf24","#3b82f6","#fff"];for(let i=0;i<60;i++){const c=document.createElement("div");c.className="confetti";c.style.left=Math.random()*100+"vw";c.style.top="-10px";c.style.background=cols[i%5];c.style.borderRadius=Math.random()>.5?"50%":"2px";c.style.animationDuration=(2+Math.random()*1.8)+"s";document.body.appendChild(c);setTimeout(()=>c.remove(),4000)}}
+document.addEventListener("click",e=>{const b=e.target.closest(".btn");if(!b)return;const r=document.createElement("span"),rc=b.getBoundingClientRect(),d=Math.max(rc.width,rc.height);r.className="ripple";r.style.width=r.style.height=d+"px";r.style.left=(e.clientX-rc.left-d/2)+"px";r.style.top=(e.clientY-rc.top-d/2)+"px";b.appendChild(r);setTimeout(()=>r.remove(),600)});
+function openOv(id){$("#"+id).classList.add("show")}
+function closeOv(id){$("#"+id).classList.remove("show")}
+document.querySelectorAll(".overlay").forEach(o=>o.addEventListener("click",e=>{if(e.target===o)o.classList.remove("show")}));
+function pitchHTML(f,cls=""){if(f&&f.image)return `<div class="pitch img ${cls}" style="background-image:url('${f.image}')"><div class="shade"></div></div>`;return `<div class="pitch ${f.style} ${cls}"><div class="circle"></div><div class="shade"></div></div>`}
+let pendingImg={add:null,edit:null};
+function readFieldImg(inp,which){const f=inp.files&&inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{pendingImg[which]=r.result;};r.readAsDataURL(f);}
+const SUN="<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='4'/><path d='M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19'/></svg></span>";
+const MOON="<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M21 12.8A8 8 0 0 1 11.2 3a7 7 0 1 0 9.8 9.8z'/></svg></span>";
+function applyTheme(t){document.body.classList.toggle("light",t==="light");const b=$("#themeBtn");if(b)b.innerHTML=(t==="light"?MOON:SUN);}
+function toggleTheme(){const t=store.get("theme","dark")==="dark"?"light":"dark";store.set("theme",t);applyTheme(t);toast(t==="light"?"Light mode":"Dark mode",ICON.checkc);}
+function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));$("#"+id).classList.add("on");window.scrollTo(0,0);$("#phone").scrollTo&&$("#phone").scrollTo(0,0)}
+function sizeLabel(s){return s+"-a-side"}
+
+/* ================= ONBOARD / AUTH ================= */
+function pickRole(r){pickedRole=r;document.querySelectorAll(".rolecard").forEach(c=>c.classList.toggle("sel",c.dataset.role===r));$("#contBtn").disabled=false}
+function goSignup(){$("#suRole").textContent=pickedRole==="owner"?"Owner":"Player";show("scr-signup")}
+function doSignup(){
+ const name=$("#suName").value.trim(),email=$("#suEmail").value.trim().toLowerCase(),pass=$("#suPass").value,ipa=$("#suIpa").value.trim();
+ if(name.length<2)return toast("Enter your full name",ICON.warn);
+ if(!/^\S+@\S+\.\S+$/.test(email))return toast("Enter a valid email",ICON.warn);
+ if(pass.length<4)return toast("Password needs 4+ characters",ICON.warn);
+ if(ipa.length<4)return toast("Enter your InstaPay wallet or bank account",ICON.warn);
+ if(users.some(u=>u.email===email))return toast("Account exists — log in instead",ICON.warn);
+ users.push({name,email,pass,ipa,role:pickedRole||"player",joined:Date.now(),subPaidUntil:0,trialUsed:false,onTrial:false});
+ session=email;saveAll();
+ pushNotif("Welcome to YallaEl3ab!","Your account is ready.");
+ if((pickedRole||"player")==="owner")show("scr-setup");else gateAfterAuth();
+}
+function doLogin(){
+ const email=$("#liEmail").value.trim().toLowerCase(),pass=$("#liPass").value;
+ const u=users.find(u=>u.email===email&&u.pass===pass);
+ if(!u){toast("Wrong email or password",ICON.ban);return}
+ session=email;saveAll();toast("Welcome back, "+u.name.split(" ")[0]+"!",ICON.ball);askHaveInstaPay();
+}
+function logout(){session=null;saveAll();$("#tabbar").classList.remove("on");$("#aiFab").classList.remove("on");show("scr-onboard")}
+function completeSetup(){
+ const n=$("#sfName").value.trim(),c=$("#sfCity").value.trim(),p=+$("#sfPrice").value,s=+$("#sfSize").value;
+ if(!n||!c||!p)return toast("Fill in all fields",ICON.warn);
+ fields.push({id:Date.now(),name:n,city:c,area:c,size:s,price:p,rating:5.0,reviews:0,turf:"Artificial turf",hours:"08:00 - 00:00",style:["","v2","v3","night"][Math.floor(Math.random()*4)],lat:Math.random()*.7+.15,lng:Math.random()*.7+.15,owner:session,createdAt:Date.now(),expiresAt:Date.now()+30*86400000});
+ saveAll();confetti();toast("Field added! Players can now find it",ICON.stadium);gateAfterAuth();
+}
+function skipSetup(){gateAfterAuth()}
+
+/* ================= TABS / NAV ================= */
+const PLAYER_TABS=[["home","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 11l8-7 8 7'/><path d='M6 10v10h12V10'/></svg></span>","Home"],["explore","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M15 9l-2 6-4 0 2-6z'/></svg></span>","Explore"],["map","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z'/><path d='M9 4v14M15 6v14'/></svg></span>","Map"],["bookings","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='5' width='16' height='16' rx='2'/><path d='M4 9h16M8 3v4M16 3v4'/></svg></span>","Bookings"],["profile","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='8' r='4'/><path d='M5 21c0-4 3.5-6 7-6s7 2 7 6'/></svg></span>","Profile"]];
+const OWNER_TABS=[["dash","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='7' height='7' rx='1'/><rect x='14' y='3' width='7' height='7' rx='1'/><rect x='3' y='14' width='7' height='7' rx='1'/><rect x='14' y='14' width='7' height='7' rx='1'/></svg></span>","Dashboard"],["myfields","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 9h16M4 9l1-5h14l1 5M5 9v11h14V9M9 20v-5h6v5'/></svg></span>","My Fields"],["earnings","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 21h18'/><rect x='5' y='11' width='3' height='8'/><rect x='11' y='6' width='3' height='13'/><rect x='17' y='13' width='3' height='6'/></svg></span>","Earnings"],["reserv","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='5' width='16' height='16' rx='2'/><path d='M4 9h16M8 3v4M16 3v4'/></svg></span>","Bookings"],["settings","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='3'/><path d='M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2'/></svg></span>","Settings"]];
+let curTab="home";
+function buildTabbar(){
+ const role=me().role,tabs=role==="owner"?OWNER_TABS:PLAYER_TABS;
+ $("#tabbar").innerHTML=tabs.map(([id,ic,lb])=>`<button class="tab ${id===curTab?"active":""}" data-t="${id}" onclick="goTab('${id}')"><span class="tic">${ic}</span>${lb}</button>`).join("");
+ $("#tabbar").classList.add("on");
+}
+function goTab(t){
+ curTab=t;
+ document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.t===t));
+ const render={home:renderHome,explore:renderExplore,map:renderMap,bookings:renderBookings,profile:renderProfile,dash:renderDash,myfields:renderMyFields,earnings:renderEarnings,reserv:renderReserv,settings:renderSettings}[t];
+ render&&render();
+ show("scr-"+t);
+}
+function enterApp(){
+ const u=me();if(!u)return show("scr-onboard");
+ touchOwnerFields(); // owner active -> refresh their pitches' 30-day clock
+ // reset per-session UI state so a new account never inherits the previous one's search/filter
+ curQuery="";curFilter="All";bkTab="upcoming";rsTab="pending";selField=null;selSlot=null;
+ if($("#homeSearch"))$("#homeSearch").value="";
+ if($("#exSearch"))$("#exSearch").value="";
+ curTab=u.role==="owner"?"dash":"home";
+ buildTabbar();$("#aiFab").classList.toggle("on",u.role!=="owner");
+ goTab(curTab);
+}
+
+/* ================= FILTER / SEARCH ================= */
+const CHIPS=[["All","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='7' height='7' rx='1'/><rect x='14' y='3' width='7' height='7' rx='1'/><rect x='3' y='14' width='7' height='7' rx='1'/><rect x='14' y='14' width='7' height='7' rx='1'/></svg></span>"],["5-a-side","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M12 7l4 3-1.5 5h-5L8 10z'/></svg></span>"],["7-a-side","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M12 7l4 3-1.5 5h-5L8 10z'/></svg></span>"],["11-a-side","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M8 4h8v5a4 4 0 0 1-8 0z'/><path d='M8 6H5a3 3 0 0 0 3 3M16 6h3a3 3 0 0 1-3 3M10 14h4M9 20h6M12 14v6'/></svg></span>"]];
+function chipsHTML(){return CHIPS.map(([c,ic])=>`<button class="chip ${c===curFilter?"active":""}" onclick="setFilter('${c}')">${ic} ${c}</button>`).join("")}
+function setFilter(c){curFilter=c;renderHome();renderExplore();if(curTab==="home")show("scr-home");}
+function syncSearch(v){curQuery=v;$("#homeSearch").value=v;$("#exSearch").value=v;renderHome();renderExplore()}
+function filtered(){
+ const q=curQuery.toLowerCase();
+ return fields.filter(f=>
+  (curFilter==="All"||sizeLabel(f.size)===curFilter)&&
+  (!q||f.name.toLowerCase().includes(q)||f.city.toLowerCase().includes(q)||f.area.toLowerCase().includes(q)||f.turf.toLowerCase().includes(q)));
+}
+
+/* ================= PLAYER RENDERS ================= */
+function favBtn(f){const on=favs.includes(f.id);return `<button class="favbtn ${on?"on":""}" onclick="event.stopPropagation();togFav(${f.id})">${on?"<span class='ico'><svg viewBox='0 0 24 24' fill='currentColor'><path d='M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10z'/></svg></span>":"<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10z'/></svg></span>"}</button>`}
+function miniCard(f,i){
+ return `<div class="mini-card" style="animation-delay:${i*80}ms" onclick="openBooking(${f.id})">
+  <div style="position:relative">${favBtn(f)}${pitchHTML(f)}<div class="bigprice" style="font-size:1rem">${f.price} EGP<small>/hr</small></div></div>
+  <div class="mb"><b>${esc(f.name)}</b><div class="row"><span class="ratep">★ ${f.rating}</span><span class="pricep">${f.price} EGP/hr</span></div></div></div>`;
+}
+function bigCard(f,i){
+ return `<div class="fcard" style="animation-delay:${i*70}ms" onclick="openBooking(${f.id})">
+  <div style="position:relative">${favBtn(f)}<span class="sizebadge">${sizeLabel(f.size)}</span>${pitchHTML(f)}<div class="bigprice">${f.price} EGP <small>/hr</small></div></div>
+  <div class="fb"><div class="nm"><b>${esc(f.name)}</b><span class="ratep">★ ${f.rating}</span><span class="muted" style="font-size:.8rem">(${f.reviews})</span></div>
+  <div class="loc"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z'/><circle cx='12' cy='10' r='2.5'/></svg></span> ${esc(f.area)} • ${esc(f.city)}</div>
+  <div class="tagrow"><span class="tag">${f.turf}</span><span class="tag">${f.hours}</span></div></div></div>`;
+}
+function renderHome(){
+ const u=me();$("#phGreet").textContent="Yalla, "+u.name.split(" ")[0];
+ $("#homeChips").innerHTML=chipsHTML();
+ const list=filtered();
+ $("#topRated").innerHTML=[...list].sort((a,b)=>b.rating-a.rating).slice(0,6).map(miniCard).join("")||`<div class="muted" style="padding:10px 4px">No matches.</div>`;
+ $("#recList").innerHTML=[...list].sort((a,b)=>b.reviews-a.reviews).slice(0,4).map(bigCard).join("");
+ $("#notifDot").style.display=notifs.some(n=>!n.read)?"block":"none";
+}
+function renderExplore(){
+ $("#exChips").innerHTML=chipsHTML();
+ const list=filtered();
+ $("#exCount").textContent=list.length+" fields found";
+ $("#exList").innerHTML=list.map(bigCard).join("")||`<div class="emptybox"><div class="eic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 16l13-7 2 4-13 7zM10 13l3 5M7 19l2-3'/></svg></span></div><b>No fields found</b><span>Try a different search or filter.</span></div>`;
+}
+function renderMap(){
+ $("#pins").innerHTML=fields.slice(0,8).map((f,i)=>`<div class="pin" style="left:${f.lng*100}%;top:${f.lat*100}%;animation-delay:${i*100}ms" onclick="openBooking(${f.id})" title="${esc(f.name)}"><div class="head"><span><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M12 7l4 3-1.5 5h-5L8 10z'/></svg></span></span></div></div>`).join("");
+ const cities=[...new Set(fields.map(f=>f.city))];
+ $("#mapList").innerHTML=cities.map(c=>{
+  const list=fields.filter(f=>f.city===c);
+  return `<div class="cityhead"><span class="cdot"></span>${esc(c)}<span class="cnt">${list.length} field${list.length>1?"s":""}</span></div>`+
+  list.map((f,i)=>`<div class="mrow" style="animation-delay:${i*70}ms" onclick="openBooking(${f.id})">${pitchHTML(f)}
+   <div class="info"><b>${esc(f.name)} ${favs.includes(f.id)?"<span class='ico'><svg viewBox='0 0 24 24' fill='currentColor'><path d='M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10z'/></svg></span>":""}</b><span class="ratep">★ ${f.rating}</span> <span class="muted" style="font-size:.78rem">(${f.reviews})</span><div class="l"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z'/><circle cx='12' cy='10' r='2.5'/></svg></span> ${esc(f.area)}</div><span class="sizebadge" style="position:static">${sizeLabel(f.size)}</span></div>
+   <div class="pricetag" style="color:var(--orange)">${f.price} <small style="font-weight:600;color:var(--muted)">EGP/hr</small></div></div>`).join("");
+ }).join("");
+}
+function togFav(id){
+ if(favs.includes(id)){favs=favs.filter(x=>x!==id);toast("Removed from favorites",ICON.brokenheart)}
+ else{favs.push(id);toast("Added to favorites",ICON.heartfill)}
+ saveAll();
+ ({home:renderHome,explore:renderExplore,map:renderMap,profile:renderProfile}[curTab]||renderHome)();
+}
+function setBkTab(t){bkTab=t;document.querySelectorAll("#bkTabs .t2").forEach(b=>b.classList.toggle("active",b.dataset.f===t));renderBookings()}
+function myBookings(){return bookings.filter(b=>b.user===session)}
+function bkStatusGroup(b){
+ if(b.status==="cancelled"||b.status==="declined")return"cancelled";
+ const end=new Date(b.date+"T23:59");
+ return end<new Date()?"past":"upcoming";
+}
+function renderBookings(){
+ const list=myBookings().filter(b=>bkStatusGroup(b)===bkTab).sort((a,b)=>b.created-a.created);
+ $("#bkList").innerHTML=list.length?list.map((b,i)=>{
+  const f=fields.find(x=>x.id===b.fieldId)||{name:"Field",style:""};
+  const pill=b.status==="pending"?"pending":bkTab==="cancelled"?b.status:bkTab==="past"?"past":"upcoming";
+  return `<div class="bkcard" style="animation-delay:${i*70}ms">${pitchHTML(f)}
+   <div class="info"><div class="row"><b>${esc(f.name)}</b><div class="spacer"></div><span class="statuspill ${pill}">${pill}</span></div>
+   <div class="l"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='5' width='16' height='16' rx='2'/><path d='M4 9h16M8 3v4M16 3v4'/></svg></span> ${fmtDate(b.date)}</div><div class="l"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M12 7v5l3 2'/></svg></span> ${b.slot} • ${payName(b.pay)}</div></div>
+   <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px"><span class="pricetag">${b.price} EGP</span>
+   <button class="btn ghost sm" onclick="openBookingDetail(${b.id})">Details</button>
+   ${bkTab==="upcoming"?`<button class="btn red sm" onclick="cancelBk(${b.id})">Cancel</button>`:""}</div></div>`;
+ }).join(""):`<div class="emptybox"><div class="eic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='5' width='16' height='16' rx='2'/><path d='M4 9h16M8 3v4M16 3v4'/></svg></span></div><b>No ${bkTab} bookings</b><span>Find a field and book your next match.</span></div>`;
+}
+function cancelBk(id){const b=bookings.find(x=>x.id===id);if(!b)return;b.status="cancelled";saveAll();renderBookings();toast("Booking cancelled",ICON.trash)}
+function fmtDate(d){return new Date(d+"T12:00").toLocaleDateString("en-GB",{weekday:"short",month:"short",day:"numeric"})}
+function payName(id){const p=PAYMENTS.find(p=>p.id===id);return p?p.name:"Cash"}
+
+function renderProfile(){
+ const u=me(),mine=myBookings().filter(b=>b.status!=="cancelled");
+ const pts=mine.length*50;
+ const rank=pts>=500?"Pitch Legend":pts>=300?"Regular Baller":pts>=100?"Local Scout":"Rookie";
+ const next=pts>=500?"Max rank!":pts>=300?`Pitch Legend at 500 pts`:pts>=100?`Regular Baller at 300 pts`:`Local Scout at 100 pts`;
+ const pct=Math.min(100,(pts%100));
+ $("#scr-profile").innerHTML=`
+  <div class="profTop">
+   <div class="bigav">${esc(u.name[0].toUpperCase())}</div>
+   <h1 style="margin-top:14px">${esc(u.name.split(" ")[0])}</h1>
+   <p class="muted">${esc(u.email)}</p>
+   <span class="rolepill"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M12 7l4 3-1.5 5h-5L8 10z'/></svg></span> ${u.role==="owner"?"Owner":"Player"}</span>
+  </div>
+  <div class="rankcard">
+   <div class="row"><div><span class="muted" style="font-size:.74rem;font-weight:800;letter-spacing:1.5px">YOUR RANK</span>
+   <h2 style="margin-top:4px"><span class='ico'><svg viewBox='0 0 24 24' fill='#fbbf24'><path d='M12 3l2.6 5.6 6 .8-4.4 4.2 1.1 6-5.3-2.9-5.3 2.9 1.1-6L3.4 9.4l6-.8z'/></svg></span> ${rank}</h2><span class="muted" style="font-size:.82rem">Next: ${next}</span></div>
+   <div class="spacer"></div><div style="text-align:right"><span class="pts">${pts}</span><div class="muted" style="font-size:.8rem">pts</div></div></div>
+   <div class="pbar"><i data-w="${pct}"></i></div>
+   <div class="row muted" style="font-size:.78rem"><span>${mine.length} bookings × 50 pts</span><div class="spacer"></div><span>${favs.length} favorites</span></div>
+  </div>
+  <div class="statgrid">
+   <div class="scard"><div class="sic" style="background:rgba(255,106,43,.15)"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M12 7l4 3-1.5 5h-5L8 10z'/></svg></span></div><b>${mine.length}</b><span>Matches</span></div>
+   <div class="scard" style="animation-delay:.08s"><div class="sic" style="background:rgba(239,68,68,.13)"><span class='ico'><svg viewBox='0 0 24 24' fill='currentColor'><path d='M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10z'/></svg></span></div><b>${favs.length}</b><span>Favorites</span></div>
+   <div class="scard" style="animation-delay:.16s"><div class="sic" style="background:rgba(251,191,36,.13)"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M8 4h8v5a4 4 0 0 1-8 0z'/><path d='M8 6H5a3 3 0 0 0 3 3M16 6h3a3 3 0 0 1-3 3M10 14h4M9 20h6M12 14v6'/></svg></span></div><b>${pts}</b><span>Points</span></div>
+  </div>
+  <div class="lsec">ACCOUNT</div>
+  <div class="lrow" onclick="toast('Profile editing coming soon',ICON.tools)"><div class="lic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='8' r='4'/><path d='M5 21c0-4 3.5-6 7-6s7 2 7 6'/></svg></span></div><b>Personal info</b><span class="arr">›</span></div>
+  <div class="lrow" onclick="toast('Saved cards: Visa •••• 4242 (demo)',ICON.card)"><div class="lic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='5' width='18' height='14' rx='2'/><path d='M3 10h18'/></svg></span></div><b>Payment methods</b><span class="arr">›</span></div>
+  <div class="lrow" onclick="openIpaEditor()"><div class="lic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='6' width='18' height='12' rx='2'/><circle cx='12' cy='12' r='2.5'/></svg></span></div><b>InstaPay address ${me()&&me().ipa?'✓':''}</b><span class="arr">›</span></div>
+  <div class="lrow" onclick="goTab('explore');curQuery='';"><div class="lic"><span class='ico'><svg viewBox='0 0 24 24' fill='currentColor'><path d='M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10z'/></svg></span></div><b>Favorite fields</b><span class="arr">›</span></div>
+  <div class="lrow" onclick="switchRole()"><div class="lic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M20 11A8 8 0 0 0 6 6L4 8M4 13a8 8 0 0 0 14 5l2-2'/><path d='M4 4v4h4M20 20v-4h-4'/></svg></span></div><b>Switch to ${u.role==="owner"?"Player":"Owner"} mode</b><span class="arr">›</span></div>
+  <div class="lrow" onclick="logout()" style="border-color:rgba(239,68,68,.3)"><div class="lic" style="background:rgba(239,68,68,.13)"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M14 3H5v18h9M14 12h6M17 9l3 3-3 3'/></svg></span></div><b style="color:var(--red)">Log out</b><span class="arr">›</span></div>
+  <div style="height:20px"></div>`;
+ requestAnimationFrame(()=>setTimeout(()=>document.querySelectorAll(".pbar i").forEach(b=>b.style.width=b.dataset.w+"%"),80));
+}
+function switchRole(){const u=me();u.role=u.role==="owner"?"player":"owner";saveAll();toast("Switched to "+(u.role==="owner"?"Owner":"Player")+" mode",ICON.refresh);enterApp()}
+
+/* ================= BOOKING FLOW ================= */
+const SLOTS=["16:00 - 17:00","17:00 - 18:00","18:00 - 19:00","19:00 - 20:00","20:00 - 21:00","21:00 - 22:00","22:00 - 23:00","23:00 - 00:00","00:00 - 01:00"];
+function openBooking(id){
+ if(me().role==="owner")return toast("Switch to Player mode to book",ICON.refresh);
+ selField=fields.find(f=>f.id===id);selSlot=null;selPay=null;
+ $("#bkTitle").textContent=selField.name;
+ $("#bkSub").textContent=`${selField.area} • ${sizeLabel(selField.size)} • ★ ${selField.rating}`;
+ const tmr=new Date(Date.now()+86400000);
+ $("#bkDate").value=tmr.toISOString().slice(0,10);
+ $("#bkDate").min=new Date().toISOString().slice(0,10);
+ selPay="instapay";
+ renderSlots();renderPays("bkPays",p=>{selPay=p;renderPays("bkPays",null,selPay);pmExtraHTML("pmExtra",p);updateSummary()});
+ pmExtraHTML("pmExtra","instapay");updateSummary();
+ openOv("ovBook");
+}
+function renderSlots(){
+ const date=$("#bkDate").value;
+ const taken=bookings.filter(b=>b.fieldId===selField.id&&b.date===date&&b.status!=="cancelled"&&b.status!=="declined").map(b=>b.slot);
+ $("#bkSlots").innerHTML=SLOTS.map(s=>`<div class="slot ${s===selSlot?"sel":""} ${taken.includes(s)?"taken":""}" onclick="${taken.includes(s)?"":`pickSlot('${s}')`}">${s.split(" - ")[0]}</div>`).join("");
+}
+$("#bkDate").addEventListener("change",()=>{selSlot=null;renderSlots();updateSummary()});
+function pickSlot(s){selSlot=s;renderSlots();updateSummary()}
+const LOCK_SVG="<span class='lockbadge'><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='5' y='11' width='14' height='9' rx='2'/><path d='M8 11V8a4 4 0 0 1 8 0v3'/></svg></span></span>";
+const CHK_SVG="<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12l5 5 9-11'/></svg></span>";
+function renderPays(elId,onPick,selId){
+ const lockIP=true; // InstaPay is the only allowed method everywhere
+ if(elId==="pwPays")selAccessPay="instapay";else if(elId==="bkPays")selPay="instapay";else selSubPay="instapay";
+ const sel="instapay";
+ $("#"+elId).innerHTML=PAYMENTS.map(p=>{
+  const locked=lockIP&&p.id!=="instapay";
+  if(locked)return `<div class="pm locked" onclick="lockedPay(this)" title="InstaPay only">${LOCK_SVG}<div class="pmlogo">${p.logo}</div><div class="pmname">${p.name}</div></div>`;
+  return `<div class="pm ${sel===p.id?"sel":""}" onclick="pickPay('${elId}','${p.id}')"><span class="chk">${CHK_SVG}</span><div class="pmlogo">${p.logo}</div><div class="pmname">${p.name}</div></div>`;
+ }).join("");
+}
+function lockedPay(el){el.classList.remove("shakeX");void el.offsetWidth;el.classList.add("shakeX");toast("Payments are InstaPay only",ICON.warn);}
+function pickPay(elId,pid){
+ if(elId==="bkPays"){selPay=pid;renderPays("bkPays");pmExtraHTML("pmExtra",pid);updateSummary()}
+ else if(elId==="pwPays"){selAccessPay=pid;renderPays("pwPays");pmExtraHTML("pwExtra",pid);updatePwBtn()}
+ else{selSubPay=pid;renderPays("subPays");pmExtraHTML("subPmExtra",pid)}
+}
+function pmExtraHTML(elId,pid){
+ const p=PAYMENTS.find(x=>x.id===pid);if(!p)return $("#"+elId).innerHTML="";
+ if(p.type==="card")$("#"+elId).innerHTML=`<div class="field" style="margin-top:12px"><label>${p.name} card details (demo)</label>
+  <div class="inwrap" style="margin-bottom:9px"><span class="ic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='5' width='18' height='14' rx='2'/><path d='M3 10h18'/></svg></span></span><input placeholder="4242 4242 4242 4242" maxlength="19"></div>
+  <div class="row"><div class="inwrap" style="flex:1"><input placeholder="MM/YY" maxlength="5"></div><div class="inwrap" style="flex:1"><input placeholder="CVC" maxlength="4"></div></div></div>`;
+ else if(p.id==="instapay"){
+  if(elId==="pmExtra"&&selField){
+   const acct=fieldOwnerAcct(selField);
+   $("#"+elId).innerHTML=`<div class="field" style="margin-top:12px"><label>Send payment to the owner's account</label>
+    <div class="acctbox"><span id="ownerAcct">${esc(acct)}</span><button type="button" class="btn sm" onclick="copyAcct('ownerAcct')">Copy</button></div>
+    <p class="muted" style="font-size:.8rem;margin-top:8px">Open InstaPay and send <b>${selField.price} EGP</b> to this account, then upload your transfer screenshot from My Bookings → Details.</p></div>`;
+  } else if(elId==="subPmExtra"||elId==="pwExtra"){
+   $("#"+elId).innerHTML=`<div class="field" style="margin-top:12px"><label>Send the subscription to this InstaPay number</label>
+    <div class="acctbox"><span id="${elId}Acct">${PLATFORM_IPA}</span><button type="button" class="btn sm" onclick="copyAcct('${elId}Acct')">Copy</button></div>
+    <p class="muted" style="font-size:.8rem;margin-top:8px">Open InstaPay and send <b>${SUB_PRICE} EGP</b> to this number, then tap Pay below.</p></div>`;
+  } else {
+   $("#"+elId).innerHTML=`<div class="field" style="margin-top:12px"><label>Your InstaPay address</label><div class="inwrap"><span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="#F26B21" xmlns="http://www.w3.org/2000/svg"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg></span><input placeholder="yourname@instapay"></div></div>`;
+  }
+ }
+ else $("#"+elId).innerHTML=`<div class="notice" style="margin-top:12px">Apple Pay — confirm with Face ID on your device (demo).</div>`;
+}
+function fieldOwnerAcct(f){if(!f)return "owner@instapay";const o=users.find(u=>u.email===f.owner);return (o&&o.ipa)||"owner@instapay";}
+function fbCopy(t){try{const ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();}catch(e){}}
+function copyAcct(id){const el=$("#"+id);if(!el)return;const t=el.textContent.trim();const done=()=>toast("Account copied — paste it in InstaPay",ICON.checkc);if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done).catch(()=>{fbCopy(t);done();});}else{fbCopy(t);done();}}
+function updateSummary(){
+ if(!selField)return;
+ $("#bkSummary").innerHTML=`
+  <div class="srow"><span>Field</span><b>${esc(selField.name)}</b></div>
+  <div class="srow"><span>Date</span><b>${$("#bkDate").value?fmtDate($("#bkDate").value):"—"}</b></div>
+  <div class="srow"><span>Time</span><b>${selSlot||"—"}</b></div>
+  <div class="srow"><span>Payment</span><b>${selPay?payName(selPay):"—"}</b></div>
+  <div class="srow tot"><span>Total</span><b style="color:var(--orange)">${selField.price} EGP</b></div>`;
+}
+function confirmBooking(){
+ if(!$("#bkDate").value)return toast("Pick a date",ICON.warn);
+ if(!selSlot)return toast("Pick a time slot",ICON.warn);
+ if(!selPay)return toast("Choose a payment method",ICON.warn);
+ bookings.push({id:Date.now(),fieldId:selField.id,user:session,date:$("#bkDate").value,slot:selSlot,pay:selPay,price:selField.price,status:"pending",created:Date.now()});
+ saveAll();closeOv("ovBook");confetti();
+ toast("Request sent! Awaiting owner approval",ICON.ball);
+ pushNotif("Booking requested",`${selField.name} • ${fmtDate($("#bkDate").value)} ${selSlot}`);
+ setTimeout(()=>{ // demo: owner auto-approves demo fields
+  const b=bookings[bookings.length-1];
+  if(b&&fields.find(f=>f.id===b.fieldId).owner==="demo"&&b.status==="pending"){
+   b.status="confirmed";saveAll();
+   pushNotif("Booking confirmed",`${selField.name} accepted your request!`);
+   if(curTab==="bookings")renderBookings();
+   toast("Owner confirmed your booking!",ICON.party);
+  }
+ },5000);
+ goTab("bookings");setBkTab("upcoming");
+}
+
+/* ================= NOTIFICATIONS ================= */
+function pushNotif(t,s){notifs.unshift({t,s,time:Date.now(),read:false});saveAll();const d=$("#notifDot");if(d)d.style.display="block"}
+function openNotifs(){
+ $("#notifList").innerHTML=notifs.length?notifs.map(n=>`<div class="lrow" style="margin:0 0 10px"><div class="lic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6z'/><path d='M10 20a2 2 0 0 0 4 0'/></svg></span></div><div style="flex:1"><b style="display:block">${esc(n.t)}</b><span class="muted" style="font-size:.82rem">${esc(n.s)}</span></div><span class="muted" style="font-size:.72rem">${timeAgo(n.time)}</span></div>`).join(""):`<div class="emptybox"><div class="eic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9a6 6 0 0 1 9.5-4.8M18 13c0 2 2 6 2 6H6M10 20a2 2 0 0 0 4 0'/><path d='M3 3l18 18'/></svg></span></div><b>No notifications</b><span>You're all caught up!</span></div>`;
+ notifs.forEach(n=>n.read=true);saveAll();$("#notifDot").style.display="none";
+ openOv("ovNotif");
+}
+function timeAgo(t){const m=Math.floor((Date.now()-t)/60000);return m<1?"now":m<60?m+"m":m<1440?Math.floor(m/60)+"h":Math.floor(m/1440)+"d"}
+
+/* ================= OWNER ================= */
+function subActive(){const u=me();return u&&u.subPaidUntil>Date.now()}
+function subDaysLeft(){return Math.ceil((me().subPaidUntil-Date.now())/86400000)}
+function ownerFields(){return fields.filter(f=>f.owner===session)}
+function ownerBookings(){const ids=ownerFields().map(f=>f.id);return bookings.filter(b=>ids.includes(b.fieldId))}
+function seedOwnerDemo(){ // make dashboard feel alive on first visit
+ if(store.get("ownerSeeded_"+session,false))return;
+ if(!ownerFields().length)return;
+ const f=ownerFields()[0];
+ const today=new Date(Date.now()+86400000).toISOString().slice(0,10);
+ bookings.push({id:Date.now()+1,fieldId:f.id,user:"demo.player@ye.app",date:today,slot:"21:00 - 22:00",pay:"instapay",price:f.price,status:"pending",created:Date.now()});
+ bookings.push({id:Date.now()+2,fieldId:f.id,user:"demo.player2@ye.app",date:today,slot:"18:00 - 19:00",pay:"visa",price:f.price*2,status:"confirmed",created:Date.now()-86400000});
+ store.set("ownerSeeded_"+session,true);saveAll();
+}
+function subBannerHTML(){
+ const ok=subActive();
+ return `<div class="subbanner ${ok?"ok":"bad"}">
+  <span style="font-size:1.5rem">${ok?"<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='#22c55e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M8 12l3 3 5-6'/></svg></span>":"<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='#ef4444' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M6 6l12 12'/></svg></span>"}</span>
+  <div style="flex:1"><b>${ok?(me().onTrial?"Free trial active":"Subscription active"):"Subscription required"} ${ok&&me().onTrial?'<span class="trialpill">trial</span>':""}${ok&&me().subPending?'<span class="trialpill" style="background:rgba(251,191,36,.15);color:var(--gold);border-color:rgba(251,191,36,.35)">pending review</span>':""}</b>
+  <span>${ok?subDaysLeft()+" days left"+(me().onTrial?" — pay with InstaPay before it ends":" • renew from Settings"):"Pay 50 EGP/month to keep fields visible & accept bookings"}</span></div>
+  ${ok?"":`<button class="btn sm" onclick="openSubSheet()">Pay now</button>`}</div>`;
+}
+function renderDash(){
+ seedOwnerDemo();
+ const u=me(),ob=ownerBookings(),of=ownerFields();
+ const today=new Date().toISOString().slice(0,10);
+ const todayCnt=ob.filter(b=>b.date===today&&b.status==="confirmed").length||ob.filter(b=>b.status==="confirmed").length;
+ const week=ob.filter(b=>b.status==="confirmed").reduce((s,b)=>s+b.price,0);
+ const pend=ob.filter(b=>b.status==="pending");
+ const payV=ob.filter(b=>b.status==="pending_verification");
+ const myReports=store.get("reports",[]).filter(r=>r.owner===session);
+ const avg=of.length?(of.reduce((s,f)=>s+f.rating,0)/of.length).toFixed(1):"—";
+ $("#scr-dash").innerHTML=`
+  <div class="pad"><div class="row">
+   <div><span class="muted" style="font-size:.85rem">Welcome back</span><h1>${esc(u.name.split(" ")[0])}</h1></div>
+   <div class="spacer"></div>
+   <button class="bell" style="background:var(--card)" onclick="openNotifs()"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6z'/><path d='M10 20a2 2 0 0 0 4 0'/></svg></span><span class="nd" id="notifDot" style="display:${notifs.some(n=>!n.read)?"block":"none"}"></span></button>
+   <button class="bell" style="background:var(--orange);font-size:1.4rem" onclick="openOv('ovAddField')">+</button>
+  </div></div>
+  ${subBannerHTML()}
+  <div class="ostatgrid">
+   <div class="ostat"><div class="oic" style="background:rgba(255,106,43,.14)"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='5' width='16' height='16' rx='2'/><path d='M4 9h16M8 3v4M16 3v4'/></svg></span></div><span>Today</span><b>${todayCnt}</b><span class="delta">bookings</span></div>
+   <div class="ostat" style="animation-delay:.07s"><div class="oic" style="background:rgba(34,197,94,.13)"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='6' width='18' height='12' rx='2'/><circle cx='12' cy='12' r='2.5'/></svg></span></div><span>This week</span><b>${week.toLocaleString()}</b><span class="delta">+12%</span></div>
+   <div class="ostat" style="animation-delay:.14s"><div class="oic" style="background:rgba(124,58,237,.15)"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><ellipse cx='12' cy='12' rx='9' ry='6'/><path d='M7 12a5 3 0 0 1 10 0'/></svg></span></div><span>Fields</span><b>${of.length}</b></div>
+   <div class="ostat" style="animation-delay:.21s"><div class="oic" style="background:rgba(251,191,36,.13)"><span class='ico'><svg viewBox='0 0 24 24' fill='#fbbf24'><path d='M12 3l2.6 5.6 6 .8-4.4 4.2 1.1 6-5.3-2.9-5.3 2.9 1.1-6L3.4 9.4l6-.8z'/></svg></span></div><span>Avg rating</span><b>${avg}</b></div>
+  </div>
+  <div class="secHead"><h2>Pending requests</h2><a onclick="goTab('reserv')">See all ›</a></div>
+  ${pend.length?pend.slice(0,3).map(reqCardHTML).join(""):`<div class="emptybox" style="padding:34px"><div class="eic" style="width:64px;height:64px;font-size:1.5rem"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 12a4 4 0 0 1 8 0v7H3z'/><path d='M11 12h7a3 3 0 0 1 3 3v4'/><path d='M7 12V9'/></svg></span></div><b>No pending requests</b><span>New booking requests appear here.</span></div>`}
+  <div class="secHead"><h2>Payments to confirm</h2></div>
+  ${payV.length?payV.map(b=>{const f=fields.find(x=>x.id===b.fieldId)||{name:"Pitch"};return `<div class="reqcard"><div class="top"><div style="flex:1;min-width:0"><b>${esc(f.name)}</b><div class="l">${fmtDate(b.date)} • ${b.slot}</div><div class="l">${payName(b.pay)} <b style="color:var(--txt);margin-left:6px">${b.price} EGP</b></div></div><span class="statuspill pending_verification">paid</span></div><div class="reqbtns"><button class="btn green sm" onclick="confirmPaymentById(${b.id})">Confirm payment</button><button class="btn ghost sm" onclick="openBookingDetail(${b.id})">View proof</button></div></div>`}).join(""):`<p class="muted" style="padding:0 18px 6px;font-size:.88rem">Nothing waiting. When a player pays via InstaPay and uploads the receipt, confirm it here.</p>`}
+  <div class="secHead"><h2>My reports</h2></div>
+  ${myReports.length?myReports.map(r=>`<div class="reqcard"><div class="top"><div style="flex:1;min-width:0"><b>${esc(r.fieldName||"Pitch")}</b><div class="l">${esc(r.msg)}</div></div><span class="statuspill pending">sent</span></div></div>`).join(""):`<p class="muted" style="padding:0 18px 6px;font-size:.88rem">No reports filed. Use Settings → "Report pitch taken by someone unknown" to alert the admin.</p>`}
+  <div style="height:20px"></div>`;
+}
+function confirmPaymentById(id){
+ const b=bookings.find(x=>x.id===id);if(!b)return;
+ if(b.status!=="pending_verification")return toast("Nothing to confirm for this booking",ICON.warn);
+ if(!b.entryCode)b.entryCode=genEntryCode();
+ b.status="confirmed";b.confirmedAt=Date.now();saveAll();confetti();
+ const f=fields.find(x=>x.id===b.fieldId)||{};
+ toast("Payment confirmed — entry code issued",ICON.checkc);
+ pushNotif("Booking confirmed",`${f.name||"Pitch"} • entry code ready`);
+ if(curTab==="dash")renderDash();if(curTab==="reserv")renderReserv();
+}
+function reqCardHTML(b){
+ const f=fields.find(x=>x.id===b.fieldId);
+ return `<div class="reqcard"><div class="top">${pitchHTML(f)}
+  <div style="flex:1;min-width:0"><div class="row"><b>${esc(f.name)}</b><div class="spacer"></div><span class="statuspill pending">pending</span></div>
+  <div class="l"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='5' width='16' height='16' rx='2'/><path d='M4 9h16M8 3v4M16 3v4'/></svg></span> ${fmtDate(b.date)} • <span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M12 7v5l3 2'/></svg></span> ${b.slot}</div><div class="l"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='5' width='18' height='14' rx='2'/><path d='M3 10h18'/></svg></span> ${payName(b.pay)} <b style="color:var(--txt);margin-left:8px">${b.price} EGP</b></div></div></div>
+  <div class="reqbtns"><button class="btn sm" onclick="decide(${b.id},'confirmed')"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12l5 5 9-11'/></svg></span> Accept</button><button class="btn ghost sm" onclick="decide(${b.id},'declined')"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 6l12 12M18 6L6 18'/></svg></span> Decline</button></div></div>`;
+}
+function decide(id,st){
+ if(!subActive())return toast("Renew your subscription to accept bookings","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='#ef4444' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M6 6l12 12'/></svg></span>"),openSubSheet();
+ const b=bookings.find(x=>x.id===id);if(!b)return;
+ b.status=st;saveAll();
+ toast(st==="confirmed"?"Booking accepted":"Booking declined",ICON.clipboard);
+ if(st==="confirmed")confetti();
+ renderDash();if(curTab==="reserv")renderReserv();
+}
+function renderMyFields(){
+ const of=ownerFields();
+ $("#scr-myfields").innerHTML=`
+  <div class="pad"><div class="row"><div><h1>My Fields</h1><span class="muted" style="font-size:.88rem">${of.length} field${of.length===1?"":"s"} listed</span></div>
+  <div class="spacer"></div><button class="bell" style="background:var(--orange);font-size:1.4rem" onclick="openOv('ovAddField')">+</button></div></div>
+  <div style="height:8px"></div>
+  ${of.length?of.map((f,i)=>`<div class="fcard" style="animation-delay:${i*80}ms">
+   <div style="position:relative"><span class="sizebadge">${sizeLabel(f.size)}</span>${pitchHTML(f)}<div class="bigprice">${f.price} EGP <small>/hr</small></div></div>
+   <div class="fb"><div class="nm"><b>${esc(f.name)}</b><span class="ratep">★ ${f.rating}</span><span class="muted" style="font-size:.8rem">(${f.reviews})</span></div>
+   <div class="loc"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z'/><circle cx='12' cy='10' r='2.5'/></svg></span> ${esc(f.area)} • ${esc(f.city)}</div>
+   <div class="tagrow"><span class="tag">${f.turf}</span><span class="tag">${f.hours}</span></div>
+   <div class="reqbtns"><button class="btn ghost sm" onclick="openReviews(${f.id})">★ Reviews (${f.reviews})</button><button class="btn ghost sm" onclick="openEditField(${f.id})"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 20l1-4 11-11 3 3-11 11z'/></svg></span> Edit</button><button class="btn red sm" onclick="delField(${f.id})"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13'/></svg></span> Remove</button></div></div></div>`).join("")
+  :`<div class="emptybox"><div class="eic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 9h16M4 9l1-5h14l1 5M5 9v11h14V9M9 20v-5h6v5'/></svg></span></div><b>No fields yet</b><span>Tap + to list your first pitch.</span></div>`}
+  <div style="height:20px"></div>`;
+}
+function addField(){
+ if(ownerFields().length>=2)return toast("You can list up to 2 pitches",ICON.warn);
+ const n=$("#afName").value.trim(),c=$("#afCity").value.trim(),p=+$("#afPrice").value,s=+$("#afSize").value;
+ if(!n||!c||!p)return toast("Fill in all fields",ICON.warn);
+ fields.push({id:Date.now(),name:n,city:c,area:c,size:s,price:p,rating:5.0,reviews:0,turf:"Artificial turf",hours:"08:00 - 00:00",style:["","v2","v3","night"][Math.floor(Math.random()*4)],lat:Math.random()*.7+.15,lng:Math.random()*.7+.15,owner:session,createdAt:Date.now(),expiresAt:Date.now()+30*86400000});
+ if(pendingImg.add){fields[fields.length-1].image=pendingImg.add;pendingImg.add=null;}
+ saveAll();closeOv("ovAddField");confetti();toast("Field listed!",ICON.stadium);
+ $("#afName").value=$("#afCity").value=$("#afPrice").value="";
+ renderMyFields();
+}
+function delField(id){fields=fields.filter(f=>f.id!==id);saveAll();renderMyFields();toast("Field removed",ICON.trash)}
+/* ===== edit a field (owner) ===== */
+let editFieldId=null;
+function openEditField(id){const f=fields.find(x=>x.id===id);if(!f)return;editFieldId=id;$("#efName").value=f.name;$("#efCity").value=f.city;$("#efPrice").value=f.price;$("#efSize").value=f.size;pendingImg.edit=null;const _ei=$("#efImg");if(_ei)_ei.value="";openOv("ovEditField");}
+function saveEditField(){const f=fields.find(x=>x.id===editFieldId);if(!f)return;const n=$("#efName").value.trim(),c=$("#efCity").value.trim(),p=+$("#efPrice").value,s=+$("#efSize").value;if(!n||!c||!p)return toast("Fill in all fields",ICON.warn);f.name=n;f.city=c;f.area=c;f.price=p;f.size=s;if(pendingImg.edit){f.image=pendingImg.edit;pendingImg.edit=null;}saveAll();closeOv("ovEditField");toast("Field updated",ICON.checkc);if(curTab==="myfields")renderMyFields();}
+/* ===== reviews: 1-5 stars + comments ===== */
+function fieldReviews(id){return store.get("reviews_"+id,[]);}
+function recomputeField(id){const f=fields.find(x=>x.id===id);if(!f)return;const r=fieldReviews(id);f.reviews=r.length;if(r.length)f.rating=Math.round((r.reduce((s,v)=>s+(+v.stars||0),0)/r.length)*10)/10;saveAll();}
+let revFieldId=null,revStars=0;
+function openReviews(id){revFieldId=id;revStars=0;renderReviews();openOv("ovReviews");}
+function setRevStars(n){revStars=n;renderReviews();}
+function starRow(n,interactive){let s="";for(let i=1;i<=5;i++){const on=i<=n;s+=`<span class="rstar ${on?"on":""}" ${interactive?`onclick="setRevStars(${i})"`:""}>${on?"★":"☆"}</span>`;}return s;}
+function renderReviews(){
+ const f=fields.find(x=>x.id===revFieldId);if(!f)return;
+ const r=fieldReviews(revFieldId);const u=me();
+ const isOwner=u&&f.owner===session;
+ const avg=r.length?(r.reduce((s,v)=>s+(+v.stars||0),0)/r.length).toFixed(1):(f.rating||"—");
+ let h=`<div class="row" style="gap:10px;align-items:flex-start"><h2>${esc(f.name)}</h2><div class="spacer"></div><div style="text-align:right"><div class="ratep" style="font-size:1.1rem">★ ${avg}</div><div class="muted" style="font-size:.76rem">${r.length} review${r.length===1?"":"s"}</div></div></div>`;
+ if(u&&!isOwner)h+=`<div class="bd-sec"><h4>Rate this pitch</h4><div class="starpick">${starRow(revStars,true)}</div><div class="inwrap" style="margin-top:10px"><input id="revComment" placeholder="Share your experience (optional)"></div><button class="btn" style="width:100%;margin-top:10px" onclick="submitReview()">Post review</button></div>`;
+ h+=`<div class="lsec" style="padding:14px 0 6px">REVIEWS</div>`;
+ h+=r.length?r.map(v=>`<div class="review"><div class="row"><b>${esc(v.name||"Player")}</b><div class="spacer"></div><span class="rstars">${"★".repeat(v.stars)}${"☆".repeat(5-v.stars)}</span></div>${v.comment?`<p style="margin-top:5px;font-size:.89rem">${esc(v.comment)}</p>`:""}<span class="muted" style="font-size:.72rem">${timeAgo(v.t)}</span></div>`).join(""):`<p class="muted" style="font-size:.85rem">No reviews yet.${isOwner?" Players can rate after they play.":""}</p>`;
+ $("#revBody").innerHTML=h;
+}
+function submitReview(){
+ if(!revStars)return toast("Pick a star rating first",ICON.warn);
+ const u=me();const c=($("#revComment")?$("#revComment").value:"").trim();
+ const r=fieldReviews(revFieldId);
+ r.unshift({user:session,name:u?u.name:"Player",stars:revStars,comment:c,t:Date.now()});
+ store.set("reviews_"+revFieldId,r);recomputeField(revFieldId);
+ revStars=0;renderReviews();confetti();toast("Thanks for your review!",ICON.checkc);
+ if(curTab==="myfields")renderMyFields();if(curTab==="explore")renderExplore();if(curTab==="home")renderHome();
+}
+function renderEarnings(){
+ const ob=ownerBookings().filter(b=>b.status==="confirmed");
+ const total=ob.reduce((s,b)=>s+b.price,0);
+ const pend=ownerBookings().filter(b=>b.status==="pending").length;
+ const days=["F","S","S","M","T","W","T"];
+ const dayVals=days.map((_,i)=>ob.filter(b=>new Date(b.created).getDay()===((5+i)%7)).reduce((s,b)=>s+b.price,0));
+ const mx=Math.max(...dayVals,1);
+ $("#scr-earnings").innerHTML=`
+  <div class="pad"><h1>Earnings</h1></div>
+  <div class="earnhero"><span style="font-weight:700;opacity:.9">Total earnings</span><div class="amt">${total.toLocaleString()} EGP</div><span style="font-size:.85rem;opacity:.92"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 17l6-6 4 4 7-8'/><path d='M17 7h4v4'/></svg></span> ${total.toLocaleString()} EGP this month</span></div>
+  <div class="ostatgrid" style="padding-top:14px">
+   <div class="ostat"><div class="oic" style="background:rgba(34,197,94,.13)"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='#22c55e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M8 12l3 3 5-6'/></svg></span></div><span>Confirmed</span><b>${ob.length}</b></div>
+   <div class="ostat" style="animation-delay:.07s"><div class="oic" style="background:rgba(251,191,36,.13)"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M12 7v5l3 2'/></svg></span></div><span>Pending</span><b>${pend}</b></div>
+  </div>
+  <div class="chartbox"><h2 style="font-size:1.05rem">Last 7 days</h2><div class="chart">${days.map((d,i)=>`<div class="cbar"><i data-h="${Math.round(dayVals[i]/mx*100)}"></i><span>${d}</span></div>`).join("")}</div></div>
+  <div class="secHead"><h2>Recent payouts</h2></div>
+  ${ob.length?ob.slice(-5).reverse().map((b,i)=>{const f=fields.find(x=>x.id===b.fieldId);return `<div class="payrow" style="animation-delay:${i*70}ms"><div class="pic2"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 10l8-5 8 5M5 10v8M19 10v8M9 10v8M15 10v8M3 21h18'/></svg></span></div><div><b>${esc(f.name)}</b><span>${fmtDate(b.date)} • ${b.slot.split(" - ")[0]}</span></div><span class="amt2">+${b.price} EGP</span></div>`}).join("")
+  :`<div class="emptybox" style="padding:34px"><div class="eic" style="width:64px;height:64px;font-size:1.5rem"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='6' width='18' height='12' rx='2'/><circle cx='12' cy='12' r='2.5'/></svg></span></div><b>No payouts yet</b><span>Confirmed bookings appear here.</span></div>`}
+  <div style="height:20px"></div>`;
+ requestAnimationFrame(()=>setTimeout(()=>document.querySelectorAll(".cbar i").forEach(b=>b.style.height=Math.max(4,b.dataset.h)+"%"),100));
+}
+function setRsTab(t){rsTab=t;document.querySelectorAll("#scr-reserv .t2").forEach(b=>b.classList.toggle("active",b.dataset.f===t));renderReserv()}
+function renderReserv(){
+ const ob=ownerBookings();
+ const list=ob.filter(b=>{
+  if(rsTab==="pending")return b.status==="pending";
+  if(rsTab==="confirmed")return b.status==="confirmed"&&bkStatusGroup(b)==="upcoming";
+  return bkStatusGroup(b)==="past"||b.status==="declined"||b.status==="cancelled";
+ }).sort((a,b)=>b.created-a.created);
+ $("#rsList").innerHTML=list.length?list.map((b,i)=>{
+  const f=fields.find(x=>x.id===b.fieldId);
+  const pill=b.status==="pending"?"pending":b.status==="confirmed"?(bkStatusGroup(b)==="past"?"past":"upcoming"):b.status;
+  return `<div class="bkcard" style="animation-delay:${i*70}ms">${pitchHTML(f)}
+   <div class="info"><div class="row"><b>${esc(f.name)}</b><div class="spacer"></div><span class="statuspill ${pill}">${pill}</span></div>
+   <div class="l"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='5' width='16' height='16' rx='2'/><path d='M4 9h16M8 3v4M16 3v4'/></svg></span> ${fmtDate(b.date)}</div><div class="l"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M12 7v5l3 2'/></svg></span> ${b.slot}</div><div class="l" style="color:var(--orange)"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='5' width='18' height='14' rx='2'/><path d='M3 10h18'/></svg></span> ${payName(b.pay)}</div></div>
+   <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px"><span class="pricetag">${b.price} EGP</span>
+   <button class="btn ghost sm" onclick="openBookingDetail(${b.id})">Details</button>
+   ${b.status==="pending"?`<div class="row"><button class="btn sm" onclick="decide(${b.id},'confirmed')"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12l5 5 9-11'/></svg></span></button><button class="btn ghost sm" onclick="decide(${b.id},'declined')"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 6l12 12M18 6L6 18'/></svg></span></button></div>`:""}</div></div>`;
+ }).join(""):`<div class="emptybox"><div class="eic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 12a4 4 0 0 1 8 0v7H3z'/><path d='M11 12h7a3 3 0 0 1 3 3v4'/><path d='M7 12V9'/></svg></span></div><b>No ${rsTab} reservations</b><span>They'll show up here.</span></div>`;
+}
+function renderSettings(){
+ const u=me(),ok=subActive();
+ const days=ok?subDaysLeft():0,pp=ok?Math.min(100,days/30*100):0;
+ $("#scr-settings").innerHTML=`
+  <div class="pad"><h1>Settings</h1></div>
+  <div class="subcard">
+   <div class="row"><div><span class="muted" style="font-size:.76rem;font-weight:800;letter-spacing:1.4px">OWNER SUBSCRIPTION</span>
+   <div class="price">50 <small>EGP / month</small></div></div>
+   <div class="spacer"></div><span class="statuspill ${ok?"confirmed":"cancelled"}">${ok?"active":"expired"}</span></div>
+   <div class="subring">
+    <div class="ringy" style="--pp:${pp}%;--rc:${ok?"#22c55e":"#ef4444"}"><div>${ok?"<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='#22c55e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M8 12l3 3 5-6'/></svg></span>":"<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='#ef4444' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M6 6l12 12'/></svg></span>"}</div></div>
+    <div style="flex:1"><b>${ok?`Paid <span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12l5 5 9-11'/></svg></span> — ${days} day${days===1?"":"s"} remaining`:"Payment required"}</b>
+    <div class="muted" style="font-size:.84rem;margin-top:3px">${ok?`Renews ${new Date(u.subPaidUntil).toLocaleDateString()}`:"Your fields are hidden from players until you renew."}</div></div>
+   </div>
+   <div style="height:14px"></div>
+   <button class="btn" style="width:100%" onclick="openSubSheet()"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='5' width='18' height='14' rx='2'/><path d='M3 10h18'/></svg></span> ${ok?"Extend +30 days (50 EGP)":"Pay 50 EGP now"}</button>
+  </div>
+  <div class="lsec">PAYMENT METHODS WE ACCEPT</div>
+  <div style="padding:0 18px"><div class="pmgrid">${PAYMENTS.map(p=>`<div class="pm" style="cursor:default"><div class="pmlogo">${p.logo}</div><div class="pmname">${p.name}</div></div>`).join("")}</div></div>
+  <div class="lsec">ACCOUNT</div>
+  <div class="lrow" onclick="toast('Profile editing coming soon',ICON.tools)"><div class="lic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='8' r='4'/><path d='M5 21c0-4 3.5-6 7-6s7 2 7 6'/></svg></span></div><b>${esc(u.name)}</b><span class="arr">›</span></div>
+  <div class="lrow" onclick="openIpaEditor()"><div class="lic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='6' width='18' height='12' rx='2'/><circle cx='12' cy='12' r='2.5'/></svg></span></div><b>InstaPay address (to receive) ${me()&&me().ipa?'✓':''}</b><span class="arr">›</span></div>
+  <div class="lrow" onclick="switchRole()"><div class="lic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M20 11A8 8 0 0 0 6 6L4 8M4 13a8 8 0 0 0 14 5l2-2'/><path d='M4 4v4h4M20 20v-4h-4'/></svg></span></div><b>Switch to Player mode</b><span class="arr">›</span></div>
+  <div class="lrow" onclick="toast('Support: help@yallael3ab.app',ICON.chat)"><div class="lic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 5h16v11H9l-5 4z'/></svg></span></div><b>Help & support</b><span class="arr">›</span></div>
+  <div class="lrow" onclick="openReport()"><div class="lic" style="background:rgba(239,68,68,.13)"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='#ef4444' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3l9 17H3z'/><path d='M12 10v4M12 17h.01'/></svg></span></div><b>Report pitch taken by someone unknown</b><span class="arr">›</span></div>
+  <div class="lrow" onclick="logout()" style="border-color:rgba(239,68,68,.3)"><div class="lic" style="background:rgba(239,68,68,.13)"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M14 3H5v18h9M14 12h6M17 9l3 3-3 3'/></svg></span></div><b style="color:var(--red)">Log out</b><span class="arr">›</span></div>
+  <div style="height:20px"></div>`;
+}
+function openSubSheet(){selSubPay="instapay";renderPays("subPays");pmExtraHTML("subPmExtra","instapay");openOv("ovSub")}
+
+/* ================= APP-ACCESS MEMBERSHIP (required for everyone) ================= */
+function gateAfterAuth(){if(subActive())enterApp();else openPaywall();}
+const GIFT_SVG="<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='8' width='18' height='4' rx='1'/><path d='M5 12v9h14v-9M12 8v13M12 8C12 5 9 4 8 6s2 2 4 2zM12 8c0-3 3-4 4-2s-2 2-4 2z'/></svg></span>";
+const CLOCK_SVG="<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M12 7v5l3 2'/></svg></span>";
+function openPaywall(){
+ $("#tabbar").classList.remove("on");$("#aiFab").classList.remove("on");
+ selAccessPay="instapay";
+ const u=me();$("#pwName").textContent=u?u.name.split(" ")[0]:"";
+ const tb=$("#pwTrialBtn");
+ if(u&&u.trialUsed){tb.disabled=true;tb.innerHTML=`${CLOCK_SVG} Free trial already used`;}
+ else{tb.disabled=false;tb.innerHTML=`${GIFT_SVG} Start your 2-week free trial`;}
+ renderPays("pwPays");pmExtraHTML("pwExtra","instapay");updatePwBtn();
+ const pend=store.get("subPayments",[]).some(p=>p.user===session&&p.status==="pending");
+ const pb=$("#pwBtn");
+ if(pend){if(tb)tb.style.display="none";if(pb){pb.disabled=true;pb.innerHTML=`${CLOCK_SVG} Awaiting admin approval…`;}}
+ else{if(tb)tb.style.display="";if(pb)pb.disabled=false;}
+ show("scr-paywall");
+}
+function updatePwBtn(){const b=$("#pwBtn");if(b)b.innerHTML=`${ICON.card} Pay ${SUB_PRICE} EGP with ${selAccessPay?payName(selAccessPay):"…"}`;}
+function startTrial(){
+ const u=me();if(!u)return;
+ if(u.trialUsed)return toast("Your free trial was already used",ICON.warn);
+ u.trialUsed=true;u.onTrial=true;u.subPaidUntil=Date.now()+14*86400000;saveAll();confetti();
+ toast("Your 2-week free trial has started!",ICON.checkc);
+ pushNotif("Free trial started",`14 days of full access • until ${new Date(u.subPaidUntil).toLocaleDateString()}`);
+ enterApp();
+}
+function payAccess(){
+ if(!selAccessPay)return toast("Choose a payment method",ICON.warn);
+ const btn=$("#pwBtn");btn.disabled=true;btn.textContent="Submitting…";
+ setTimeout(()=>{
+  submitSubPayment(selAccessPay);confetti();
+  toast("You're in! The admin will confirm your payment shortly.",ICON.checkc);
+  enterApp(); // let them in immediately; admin still checks
+ },900);
+}
+function paySubscription(){
+ if(!selSubPay)return toast("Choose a payment method",ICON.warn);
+ const btn=$("#subPayBtn");btn.disabled=true;btn.textContent="Submitting…";
+ setTimeout(()=>{
+  submitSubPayment(selSubPay);
+  btn.disabled=false;btn.innerHTML="<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='5' width='18' height='14' rx='2'/><path d='M3 10h18'/></svg></span> Pay 50 EGP";
+  closeOv("ovSub");
+  toast("Payment submitted — active while the admin reviews it",ICON.checkc);
+  if(curTab==="settings")renderSettings();if(curTab==="dash")renderDash();
+ },900);
+}
+/* provisional access on payment; admin still checks (yes keeps it, no revokes it) */
+function submitSubPayment(payId){
+ const u=me();if(!u)return;
+ u.subPaidUntil=Math.max(Date.now(),u.subPaidUntil||0)+30*86400000;u.onTrial=false;u.subPending=true; // in now, admin reviews
+ const arr=store.get("subPayments",[]);
+ if(!arr.some(p=>p.user===session&&p.status==="pending")){
+  arr.unshift({id:Date.now(),user:session,name:u.name,amount:SUB_PRICE,via:payName(payId||"instapay"),t:Date.now(),status:"pending"});
+  store.set("subPayments",arr);
+ }
+ saveAll();
+ pushNotif("Payment submitted",`${SUB_PRICE} EGP • you're in — admin will confirm shortly`);
+}
+function decideSubPayment(id,yes){
+ const arr=store.get("subPayments",[]);const p=arr.find(x=>x.id===id);if(!p||p.status!=="pending")return;
+ p.status=yes?"approved":"rejected";store.set("subPayments",arr);
+ const u=users.find(x=>x.email===p.user);
+ if(u){u.subPending=false;u.onTrial=false;if(!yes)u.subPaidUntil=0;saveAll();} // approve keeps provisional 30d; decline revokes
+ toast(yes?"Payment confirmed":"Payment declined — access revoked",yes?ICON.checkc:ICON.ban);
+ pushNotif(yes?"Subscription confirmed":"Payment declined",esc(p.name||p.user));
+ if(!yes&&p.user===session){closeOv("ovAdmin");gateAfterAuth();return;} // revoked own access -> back to paywall
+ adminGate();
+}
+
+/* ================= AI ASSISTANT ================= */
+let aiStarted=false,userPos=null;
+function openAI(){
+ openOv("ovAI");
+ if(!aiStarted){aiStarted=true;aiSay("Yalla! I'm your Pitch Finder AI.\nTell me what you want and I'll find the best fields near you. Try:",["cheap 5-a-side","best rated 11-a-side","7-a-side in Giza","under 300 EGP"]);}
+ if(!userPos&&navigator.geolocation)navigator.geolocation.getCurrentPosition(p=>{userPos={lat:p.coords.latitude,lng:p.coords.longitude}},()=>{},{timeout:5000});
+}
+function aiSay(t,chips){
+ const m=document.createElement("div");m.className="msg ai";m.textContent=t;
+ if(chips)chips.forEach(c=>{const s=document.createElement("span");s.className="mini";s.textContent=c;s.onclick=()=>{$("#aiInput").value=c;aiSend()};m.appendChild(s)});
+ $("#aiMsgs").appendChild(m);$("#aiMsgs").scrollTop=1e6;
+}
+const AI_MODEL="claude-haiku-4-5-20251001"; // change to any model your key supports
+function aiSend(){
+ const q=$("#aiInput").value.trim();if(!q)return;
+ const m=document.createElement("div");m.className="msg me";m.textContent=q;$("#aiMsgs").appendChild(m);
+ $("#aiInput").value="";$("#aiMsgs").scrollTop=1e6;
+ const t=document.createElement("div");t.className="msg ai typing";t.innerHTML="<span></span><span></span><span></span>";
+ $("#aiMsgs").appendChild(t);
+ aiRespond(q).then(res=>{t.remove();renderAiResult(res.reply,res.fields);})
+             .catch(()=>{t.remove();const r=localMatch(q);renderAiResult(r.reply,r.fields);});
+}
+/* Real AI when a key is set; graceful local fallback otherwise. */
+async function aiRespond(q){
+ const key=store.get("aiKey","");
+ if(key){try{return await realAI(q,key);}catch(e){const r=localMatch(q);r.reply="(offline mode) "+r.reply;return r;}}
+ return localMatch(q);
+}
+async function realAI(q,key){
+ const cat=fields.map(f=>({id:f.id,name:f.name,city:f.city,area:f.area,size:f.size,price:f.price,rating:f.rating,turf:f.turf,hours:f.hours}));
+ const sys="You are YallaEl3ab's football-pitch booking assistant. Choose the best matching pitches ONLY from the provided list. Be friendly and concise. Today is "+new Date().toISOString().slice(0,10)+". Respond ONLY as compact JSON: {\"reply\":string,\"fieldIds\":number[]} with up to 4 ids, best first.";
+ const res=await fetch("https://api.anthropic.com/v1/messages",{
+  method:"POST",
+  headers:{"x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true","content-type":"application/json"},
+  body:JSON.stringify({model:AI_MODEL,max_tokens:400,system:sys,messages:[{role:"user",content:"Available pitches:\n"+JSON.stringify(cat)+"\n\nUser request: "+q}]})
+ });
+ if(!res.ok)throw new Error("ai_http_"+res.status);
+ const data=await res.json();
+ const txt=(data.content&&data.content[0]&&data.content[0].text)||"";
+ const parsed=JSON.parse(txt.slice(txt.indexOf("{"),txt.lastIndexOf("}")+1));
+ const ids=Array.isArray(parsed.fieldIds)?parsed.fieldIds:[];
+ const fs=ids.map(id=>fields.find(f=>f.id===id)).filter(Boolean);
+ return {reply:parsed.reply||"Here's what I found:",fields:fs};
+}
+function localMatch(q){
+ const ql=q.toLowerCase();let pool=[...fields];
+ const sz=ql.match(/(5|7|11)\s*-?\s*a/);if(sz)pool=pool.filter(f=>f.size===+sz[1]);
+ const city=["cairo","giza","riyadh","zayed","maadi","nasr","october","heliopolis","zamalek","downtown","tanta","mahalla"].find(c=>ql.includes(c));
+ if(city)pool=pool.filter(f=>(f.city+" "+f.area+" "+f.name).toLowerCase().includes(city));
+ const under=ql.match(/under\s*(\d+)|<\s*(\d+)|less than\s*(\d+)/);if(under){const lim=+(under[1]||under[2]||under[3]);pool=pool.filter(f=>f.price<=lim)}
+ if(/cheap|budget|رخيص/.test(ql))pool.sort((a,b)=>a.price-b.price);
+ else if(/best|top|rated|أحسن/.test(ql))pool.sort((a,b)=>b.rating-a.rating);
+ else pool.sort((a,b)=>b.rating*10-a.rating*10+(a.price-b.price)/100);
+ if(/grass|natural/.test(ql))pool=pool.filter(f=>/Natural/.test(f.turf));
+ if(/indoor/.test(ql))pool=pool.filter(f=>/Indoor/.test(f.turf));
+ return {reply:pool.length?"Here's what I found:":"Hmm, nothing matches that. Try '7-a-side in Tanta' or 'cheap pitches'.",fields:pool.slice(0,3)};
+}
+function renderAiResult(reply,fs){
+ let txt=(reply||"")+"\n\n";
+ (fs||[]).forEach((f,i)=>{txt+=`${i+1}. ${f.name} — ${sizeLabel(f.size)}\n   ★${f.rating} • ${f.price} EGP/hr • ${f.city}\n`;});
+ const m=document.createElement("div");m.className="msg ai";m.textContent=txt.trim();
+ (fs||[]).forEach(f=>{const s=document.createElement("span");s.className="mini";s.textContent="Book "+f.name;s.onclick=()=>{closeOv("ovAI");openBooking(f.id)};m.appendChild(s)});
+ $("#aiMsgs").appendChild(m);$("#aiMsgs").scrollTop=1e6;
+}
+/* AI key (enables real model). Stored locally only. */
+function openAiKey(){const el=$("#aiKeyInput");if(el)el.value=store.get("aiKey","");openOv("ovAiKey");}
+function saveAiKey(){store.set("aiKey",($("#aiKeyInput").value||"").trim());closeOv("ovAiKey");toast(store.get("aiKey","")?"Real AI enabled":"AI key cleared",ICON.checkc);}
+/* Login question: do you have InstaPay? */
+function askHaveInstaPay(){openOv("ovHaveIpa");}
+function haveInstaPay(yes){
+ closeOv("ovHaveIpa");
+ gateAfterAuth();
+ if(yes){if(me()&&!me().ipa)openIpaEditor();}
+ else toast("InstaPay is required to pay for bookings. You can set it up anytime in your profile.",ICON.warn);
+}
+
+/* ================= FEATURE 1 — SECRET 10-TAP ADMIN (blank password) ================= */
+let clicks=[];
+$("#secretLogo").addEventListener("click",()=>{
+ const now=Date.now();clicks=clicks.filter(t=>now-t<5000);clicks.push(now);
+ if(clicks.length===10){clicks=[];openAdminPass();}   // exactly 10 taps in 5s
+});
+document.addEventListener("pointerdown",e=>{ if(!e.target.closest("#secretLogo"))clicks=[]; }); // tap elsewhere -> reset
+function openAdminPass(){const i=$("#admPassInput");if(i)i.value="";openOv("ovAdminPass");setTimeout(()=>{const el=$("#admPassInput");if(el)el.focus();},60);}
+function adminDeviceId(){let d=store.get("deviceId","");if(!d){d="dev_"+Math.random().toString(36).slice(2)+Date.now().toString(36);store.set("deviceId",d);}return d;}
+function adminSeatAllowed(){const id=session||adminDeviceId();const seats=store.get("adminSeats",[]);if(seats.includes(id))return true;if(seats.length>=2)return false;seats.push(id);store.set("adminSeats",seats);return true;} // only 2 people may ever enter
+function openForgot(){const a=$("#fpEmail");const b=$("#fpPass");if(a)a.value="";if(b)b.value="";openOv("ovForgot");}
+function resetPass(){const em=($("#fpEmail").value||"").trim().toLowerCase();const np=$("#fpPass").value||"";if(np.length<4)return toast("Password needs 4+ characters",ICON.warn);const u=users.find(x=>x.email===em);if(u){u.pass=np;saveAll();}closeOv("ovForgot");toast("If that account exists, the password was updated — please log in",ICON.checkc);}
+function openReport(){const of=fields.filter(f=>f.owner===session);const sel=$("#rpField");if(sel)sel.innerHTML=of.length?of.map(f=>`<option value="${f.id}">${esc(f.name)}</option>`).join(""):`<option value="">(no pitch listed)</option>`;const m=$("#rpMsg");if(m)m.value="My pitch is taken by someone unknown";openOv("ovReport");}
+function submitReport(){const fid=$("#rpField").value;const f=fields.find(x=>String(x.id)===String(fid));const msg=($("#rpMsg").value||"").trim()||"My pitch is taken by someone unknown";const reports=store.get("reports",[]);reports.unshift({id:Date.now(),owner:session,fieldId:fid,fieldName:(f&&f.name)||"",msg,t:Date.now()});store.set("reports",reports);closeOv("ovReport");confetti();toast("Report sent to admin",ICON.checkc);pushNotif("Report sent to admin",msg);}
+function resolveReport(id){let reports=store.get("reports",[]);reports=reports.filter(r=>r.id!==id);store.set("reports",reports);adminGate();toast("Report resolved",ICON.checkc);}
+if($("#admPassForm"))$("#admPassForm").addEventListener("submit",e=>{
+ e.preventDefault();
+ const i=$("#admPassInput");const v=i.value||"";i.value="";
+ if(v===store.get("adminPass","AsMa@2013F")&&adminSeatAllowed()){closeOv("ovAdminPass");adminGate();}
+ /* wrong passcode, or admin seat limit (2 people) reached: silently do nothing — no label, no hint, no error */
+});
+
+/* ================= InstaPay address capture (profile setup) ================= */
+function openIpaEditor(){const u=me();const el=$("#ipaInput");if(el)el.value=(u&&u.ipa)||"";openOv("ovIpa");}
+function saveIpa(){const u=me();if(!u)return;u.ipa=($("#ipaInput").value||"").trim();saveAll();closeOv("ovIpa");toast("InstaPay address saved",ICON.checkc);if(curTab==="settings")renderSettings();if(curTab==="profile")renderProfile();}
+
+/* ================= Double-sided booking verification (Features 2/3/4) ================= */
+let bdId=null;const bdAcked=new Set();let bdVerifyResult=null;
+const ST_LABEL={requested:"Requested",pending:"Pending",awaiting_payment:"Awaiting payment",pending_verification:"Verifying payment",confirmed:"Confirmed",checked_in:"In progress",completed:"Completed",declined:"Declined",cancelled:"Cancelled"};
+function bdGet(){return bookings.find(b=>b.id===bdId);}
+function bdFieldOf(b){return fields.find(f=>f.id===b.fieldId)||{name:"Field",price:b&&b.price,owner:"demo",style:""};}
+function bdIsOwnerView(){const u=me();return !!u&&u.role==="owner";}
+function ownerIpaFor(b){const f=bdFieldOf(b);const o=users.find(u=>u.email===f.owner);return (o&&o.ipa)||"owner@instapay";}
+function genEntryCode(){let c;do{c=String(Math.floor(Math.random()*1000000)).padStart(6,"0");}while(bookings.some(x=>x.entryCode===c&&(x.status==="confirmed"||x.status==="checked_in")));return c;}
+function bdWindow(b){const p=b.slot.split(" - ");const s=new Date(b.date+"T"+p[0]+":00");let e=new Date(b.date+"T"+(p[1]||p[0])+":00");if(e<=s)e=new Date(e.getTime()+86400000);return {from:s.getTime()-2*3600000,to:e.getTime()};}
+function openBookingDetail(id){bdId=id;bdVerifyResult=null;renderBookingDetail();openOv("ovBookingDetail");}
+
+function renderBookingDetail(){
+ const b=bdGet();const host=$("#bdBody");if(!host)return;if(!b){host.innerHTML="";return;}
+ if(b.status==="confirmed"&&!b.entryCode){b.entryCode=genEntryCode();saveAll();} // ensure a code exists for any confirmed booking
+ const f=bdFieldOf(b);const owner=bdIsOwnerView();
+ const integrityBroken=Number(f.price)!==Number(b.price);
+ let h=`<div class="row"><h2>${esc(f.name)}</h2><div class="spacer"></div><span class="statuspill ${b.status}">${ST_LABEL[b.status]||b.status}</span></div>`;
+ h+=`<ul class="bd-summary"><li><span>Field</span><b>${esc(f.name)}</b></li><li><span>Date</span><b>${fmtDate(b.date)}</b></li><li><span>Time</span><b>${b.slot}</b></li><li><span>Price</span><b>${b.price} EGP</b></li><li><span>Payment</span><b>${payName(b.pay)}</b></li></ul>`;
+ if(owner){h+=bdOwnerSection(b,f);}
+ else{if(integrityBroken)h+=`<div class="bd-err">Heads up — this field's price changed to ${f.price} EGP. Please review again before continuing.</div>`;h+=bdPlayerSection(b,integrityBroken);}
+ h+=`<div class="bd-sec"><h4>Chat</h4><div class="bd-chat" id="bdChat"></div>
+   <div class="row" style="margin-top:8px"><div class="inwrap" style="flex:1"><input id="bdChatInput" placeholder="Message…" onkeydown="if(event.key==='Enter')bdSendChat()"></div><button class="btn sm" onclick="bdSendChat()">Send</button></div></div>`;
+ host.innerHTML=h;
+ renderBdChat();
+}
+
+function bdPlayerSection(b,integrityBroken){
+ if(b.status==="checked_in")return `<div class="bd-inprogress"><span class="badge">Active Match · In Progress</span><p style="margin-top:8px">You're checked in. Enjoy the match!</p></div><button class="btn ghost" style="width:100%;margin-top:10px" onclick="openReviews(${b.fieldId})">★ Rate this pitch</button>`;
+ if(b.status==="confirmed"){
+   if(integrityBroken)return "";
+   const acked=bdAcked.has(b.id);
+   let s=`<div class="bd-sec"><h4>Pre-flight check</h4><label class="bd-ack"><input type="checkbox" ${acked?"checked":""} onchange="bdSetAck(this.checked)"> I confirm the field, date, time and price above are correct.</label>`;
+   s+=acked?`<div class="entry-code-big"><div class="lab">YOUR ENTRY CODE</div><div class="digits">${b.entryCode}</div><small class="muted">Show this to the owner/guard at the gate.</small></div>`:`<p class="muted">Toggle the acknowledgment to reveal your 6-digit entry code.</p>`;
+   return s+`</div>`;
+ }
+ if(b.status==="pending_verification")return `<div class="bd-sec"><h4>Payment sent</h4><p class="muted">Your transfer is awaiting owner confirmation. Your entry code unlocks once it's confirmed.</p></div>`;
+ if(b.status==="declined"||b.status==="cancelled")return `<div class="bd-sec"><p class="muted">This booking is ${(ST_LABEL[b.status]||b.status).toLowerCase()}.</p></div>`;
+ if(b.pay==="instapay")return `<div class="bd-sec"><h4>Pay via InstaPay</h4><p class="muted" style="margin-bottom:8px">Send <b>${b.price} EGP</b> to the owner's account, then upload your transfer screenshot.</p><div class="acctbox" style="margin-bottom:10px"><span id="bdOwnerAcct">${esc(ownerIpaFor(b))}</span><button type="button" class="btn sm" onclick="copyAcct('bdOwnerAcct')">Copy</button></div><div class="inwrap" style="margin-bottom:8px"><input id="bdPlayerIpa" placeholder="Your IPA (yourname@instapay)" value="${(me()&&me().ipa)||''}"></div><input type="file" accept="image/*" id="bdProofFile"><div style="height:10px"></div><button class="btn" style="width:100%" onclick="bdSubmitProof()">Submit transfer for verification</button></div>`;
+ return `<div class="bd-sec"><p class="muted">Waiting for the owner to accept your request.</p></div>`;
+}
+
+function bdOwnerSection(b,f){
+ if(b.status==="pending_verification")return `<div class="bd-sec"><h4>Confirm InstaPay receipt</h4><p class="muted">Paid to: <b>${b.ipaTo||ownerIpaFor(b)}</b></p>${b.proof?`<img class="bd-proof" src="${b.proof}" alt="transfer proof">`:`<p class="muted">No screenshot attached.</p>`}<div style="height:10px"></div><button class="btn green" style="width:100%" onclick="bdConfirmReceipt()">Confirm receipt &amp; issue entry code</button></div>`;
+ if(b.status==="confirmed"){
+   const locked=!!bdVerifyResult&&["ok","already_used","expired"].includes(bdVerifyResult);
+   const msg={ok:"Verified — player checked in.",already_used:"This code was already used.",expired:"Code expired or outside the booking time slot.",invalid:"Incorrect code. Try again."}[bdVerifyResult||""];
+   return `<div class="bd-sec"><h4>Verify entry code</h4><input class="bd-code-input" id="bdCodeInput" inputmode="numeric" maxlength="6" placeholder="------" ${locked?"disabled":""} oninput="bdCodeInputChanged()"><div style="height:10px"></div><button class="btn" style="width:100%" onclick="bdVerifyCode()" ${locked?"disabled":""}>Verify</button>${bdVerifyResult?`<p class="${bdVerifyResult==="ok"?"bd-ok":"bd-err"}" style="margin-top:10px">${msg}</p>`:""}${locked&&bdVerifyResult!=="ok"?`<p class="muted" style="margin-top:6px">Input locked.</p>`:""}</div>`;
+ }
+ if(b.status==="checked_in")return `<div class="bd-inprogress"><span class="badge">Checked in</span></div>`;
+ if(b.status==="pending"||b.status==="requested")return `<div class="bd-sec"><h4>Booking request</h4><div class="row"><button class="btn green" onclick="bdOwnerAccept()">Accept</button><button class="btn ghost" onclick="bdOwnerDecline()">Decline</button></div></div>`;
+ return `<div class="bd-sec"><p class="muted">Status: ${ST_LABEL[b.status]||b.status}</p></div>`;
+}
+
+function bdSetAck(on){const b=bdGet();if(!b)return;if(on)bdAcked.add(b.id);else bdAcked.delete(b.id);renderBookingDetail();}
+function bdSubmitProof(){
+ const b=bdGet();if(!b)return;const fileEl=$("#bdProofFile");const file=fileEl&&fileEl.files&&fileEl.files[0];
+ if(!file)return toast("Attach your transfer screenshot",ICON.warn);
+ const u=me();const ipa=($("#bdPlayerIpa").value||"").trim();if(u&&ipa)u.ipa=ipa;
+ const r=new FileReader();
+ r.onload=()=>{b.proof=r.result;b.ipaTo=ownerIpaFor(b);b.status="pending_verification";saveAll();toast("Sent for verification",ICON.checkc);pushNotif("Payment proof sent",`${bdFieldOf(b).name} • awaiting owner confirmation`);renderBookingDetail();bdRefreshLists();};
+ r.readAsDataURL(file);
+}
+function bdOwnerAccept(){const b=bdGet();if(!b)return;b.status="awaiting_payment";saveAll();toast("Accepted — awaiting payment",ICON.checkc);renderBookingDetail();bdRefreshLists();}
+function bdOwnerDecline(){const b=bdGet();if(!b)return;b.status="declined";saveAll();toast("Declined",ICON.ban);renderBookingDetail();bdRefreshLists();}
+function bdConfirmReceipt(){const b=bdGet();if(!b)return;b.entryCode=genEntryCode();b.status="confirmed";b.confirmedAt=Date.now();saveAll();confetti();toast("Payment confirmed — entry code issued",ICON.checkc);pushNotif("Booking confirmed",`${bdFieldOf(b).name} • your entry code is ready`);renderBookingDetail();bdRefreshLists();}
+function bdCodeInputChanged(){if(bdVerifyResult==="invalid")bdVerifyResult=null;}
+function bdVerifyCode(){
+ const b=bdGet();if(!b)return;const el=$("#bdCodeInput");const code=(el?el.value:"").trim();
+ let r;
+ if(b.status==="checked_in")r="already_used";
+ else if(b.status!=="confirmed"||!b.entryCode||b.entryCode!==code)r="invalid";
+ else{const w=bdWindow(b);const now=Date.now();if(now<w.from||now>w.to)r="expired";else{b.status="checked_in";b.verifiedAt=now;saveAll();confetti();r="ok";}}
+ bdVerifyResult=r;
+ if(r==="ok"){pushNotif("Checked in",`${bdFieldOf(b).name} • match in progress`);bdRefreshLists();}
+ renderBookingDetail();
+}
+
+/* Feature 4 — chat tied to booking id; realtime across tabs via storage events */
+function bdSendChat(){const b=bdGet();if(!b)return;const el=$("#bdChatInput");const v=(el.value||"").trim();if(!v)return;const k="chat_"+b.id;const arr=store.get(k,[]);arr.push({from:session,body:v,t:Date.now()});store.set(k,arr);el.value="";renderBdChat();}
+function renderBdChat(){const b=bdGet();const box=$("#bdChat");if(!b||!box)return;const arr=store.get("chat_"+b.id,[]);box.innerHTML=arr.map(m=>`<div class="cmsg ${m.from===session?"me":"them"}">${esc(m.body)}</div>`).join("")||`<p class="muted" style="font-size:.84rem">No messages yet.</p>`;box.scrollTop=box.scrollHeight;}
+
+function bdRefreshLists(){const r={home:renderHome,bookings:renderBookings,dash:renderDash,reserv:renderReserv,profile:renderProfile,settings:renderSettings,myfields:renderMyFields,earnings:renderEarnings}[curTab];if(r)r();}
+
+/* cross-tab realtime: other tab writes localStorage -> reload shared state & re-render */
+window.addEventListener("storage",e=>{
+ if(!e.key||e.key.indexOf("ye_")!==0)return;
+ bookings=store.get("bookings",bookings);users=store.get("users",users);fields=store.get("fields",fields);notifs=store.get("notifs",notifs);
+ if($("#ovBookingDetail")&&$("#ovBookingDetail").classList.contains("show"))renderBookingDetail();
+ if($("#scr-paywall")&&$("#scr-paywall").classList.contains("on")&&me()&&subActive())enterApp(); // admin approved -> let them in live
+ if($("#tabbar")&&$("#tabbar").classList.contains("on")&&me()&&!subActive())openPaywall(); // admin revoked -> back to paywall
+ bdRefreshLists();
+});
+function adminGate(){
+ const owners=users.filter(u=>u.role==="owner");
+ const reports=store.get("reports",[]);
+ const seats=store.get("adminSeats",[]).length;
+ const shield="<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3l8 3v6c0 5-4 8-8 9-4-1-8-4-8-9V6z'/></svg></span>";
+ const okI="<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='#22c55e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M8 12l3 3 5-6'/></svg></span>";
+ const noI="<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='#ef4444' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M6 6l12 12'/></svg></span>";
+ const flag="<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='#ef4444' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3l9 17H3z'/><path d='M12 10v4M12 17h.01'/></svg></span>";
+ const paid=owners.filter(o=>o.subPaidUntil>Date.now()).length,unpaid=owners.length-paid;
+ const people="<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='9' cy='8' r='3'/><path d='M3 20c0-3 2.5-5 6-5s6 2 6 5'/><path d='M16 6a3 3 0 0 1 0 6M21 20c0-2.5-1.5-4.3-4-4.8'/></svg></span>";
+ let h=`<div class="row" style="gap:13px;margin-bottom:2px"><div style="width:54px;height:54px;border-radius:16px;background:linear-gradient(135deg,#7c3aed,#a855f7);display:grid;place-items:center;color:#fff;font-size:1.5rem;box-shadow:0 10px 24px rgba(124,58,237,.4)" class="admAv">${shield}</div><div><h2>Super Admin</h2><span class="muted" style="font-size:.82rem">${seats}/2 seats • platform overview</span></div></div>`;
+ h+=`<div class="ostatgrid" style="padding:10px 0 0">
+  <div class="ostat"><div class="oic" style="background:rgba(124,58,237,.15)">${people}</div><span>Owners</span><b>${owners.length}</b></div>
+  <div class="ostat" style="animation-delay:.06s"><div class="oic" style="background:rgba(34,197,94,.13)">${okI}</div><span>Paid</span><b>${paid}</b></div>
+  <div class="ostat" style="animation-delay:.12s"><div class="oic" style="background:rgba(239,68,68,.13)">${noI}</div><span>Unpaid</span><b>${unpaid}</b></div>
+  <div class="ostat" style="animation-delay:.18s"><div class="oic" style="background:rgba(239,68,68,.13)">${flag}</div><span>Reports</span><b>${reports.length}</b></div>
+ </div>`;
+ const subPays=store.get("subPayments",[]).filter(p=>p.status==="pending");
+ h+=`<div class="secHead" style="padding:18px 0 8px"><h2>Subscription payments</h2></div>`;
+ h+=subPays.length?subPays.map(p=>`<div class="reqcard" style="margin:0 0 11px"><div class="top"><div style="flex:1;min-width:0"><b>${esc(p.name||p.user)}</b><div class="l" style="color:var(--muted)">${p.amount} EGP • ${esc(p.via||"InstaPay")} • ${timeAgo(p.t)}</div></div><span class="statuspill pending_verification">pending</span></div><div class="reqbtns"><button class="btn green sm" onclick="decideSubPayment(${p.id},true)">Yes, approve</button><button class="btn red sm" onclick="decideSubPayment(${p.id},false)">No</button></div></div>`).join(""):`<p class="muted" style="font-size:.85rem">No payments waiting for approval.</p>`;
+ h+=`<div class="secHead" style="padding:18px 0 8px"><h2>Reported pitches</h2></div>`;
+ h+=reports.length?reports.map(r=>`<div class="reqcard" style="margin:0 0 11px"><div class="top"><div class="lic" style="background:rgba(239,68,68,.13);width:42px;height:42px;border-radius:12px;display:grid;place-items:center;flex-shrink:0">${flag}</div><div style="flex:1;min-width:0;margin-left:11px"><b>${esc(r.fieldName||"Pitch")}</b><div class="l" style="color:var(--muted)">${esc(r.msg)}</div><div class="l" style="color:var(--muted);font-size:.78rem">${esc(r.owner||"")}</div></div><span class="statuspill pending_verification">open</span></div><div class="reqbtns"><button class="btn ghost sm" style="flex:0 0 auto" onclick="resolveReport(${r.id})">Mark resolved</button></div></div>`).join(""):`<div class="emptybox" style="padding:28px"><div class="eic" style="width:60px;height:60px;font-size:1.4rem">${flag}</div><b>No reports</b><span>Pitch problem reports appear here.</span></div>`;
+ h+=`<div class="secHead" style="padding:18px 0 8px"><h2>Owners</h2></div>`;
+ h+=owners.length?owners.map(o=>{const ok=o.subPaidUntil>Date.now();return `<div class="lrow" style="margin:0 0 10px"><div class="lic">${ok?okI:noI}</div><div style="flex:1"><b style="display:block">${esc(o.name)}</b><span class="muted" style="font-size:.8rem">${esc(o.email)}</span></div><span class="statuspill ${ok?"confirmed":"cancelled"}">${ok?"paid":"unpaid"}</span></div>`}).join(""):`<p class="muted" style="font-size:.85rem">No owners yet.</p>`;
+ $("#adminBody").innerHTML=h;
+ openOv("ovAdmin");
+}
+
+/* ================= INIT ================= */
+const FIELD_TTL=30*86400000; // owner pitches auto-expire 30 days after the owner is last active
+function touchOwnerFields(){const u=me();if(!u||u.role!=="owner")return;let ch=false;fields.forEach(f=>{if(f.owner===session){f.expiresAt=Date.now()+FIELD_TTL;ch=true;}});if(ch)saveAll();}
+function purgeExpiredFields(){const now=Date.now();let ch=false;fields.forEach(f=>{if(f.owner!=="demo"&&!f.expiresAt){f.expiresAt=now+FIELD_TTL;ch=true;}});const before=fields.length;fields=fields.filter(f=>f.owner==="demo"||!f.expiresAt||f.expiresAt>now);if(ch||fields.length!==before)saveAll();}
+purgeExpiredFields(); // saved across logout; removed only after 30 days of owner inactivity
+if(store.get("seedV",0)<3){SEED_FIELDS.forEach(s=>{if(!fields.some(f=>f.id===s.id))fields.push(s);});store.set("fields",fields);store.set("seedV",3);}
+applyTheme(store.get("theme","dark"));
+if(session&&me())gateAfterAuth();else show("scr-onboard");
+</script>
+</body>
+</html>
