@@ -934,7 +934,7 @@ function enterApp(){
  const u=me();if(!u)return show("scr-onboard");
  touchOwnerFields(); // owner active -> refresh their pitches' 30-day clock
  // reset per-session UI state so a new account never inherits the previous one's search/filter
- curQuery="";curFilter="All";bkTab="upcoming";rsTab="pending";selField=null;selSlot=null;
+ curQuery="";curFilter="All";bkTab="upcoming";rsTab="pending";selField=null;selSlot=null;ownerQuery="";
  if($("#homeSearch"))$("#homeSearch").value="";
  if($("#exSearch"))$("#exSearch").value="";
  curTab=u.role==="owner"?"dash":"home";
@@ -1241,20 +1241,29 @@ function decide(id,st){
  if(st==="confirmed")confetti();
  renderDash();if(curTab==="reserv")renderReserv();
 }
+let ownerQuery="";
+function mfSearch(v){ownerQuery=v;renderMfList();}
 function renderMyFields(){
  const of=ownerFields();
  $("#scr-myfields").innerHTML=`
   <div class="pad"><div class="row"><div><h1>My Fields</h1><span class="muted" style="font-size:.88rem">${of.length} field${of.length===1?"":"s"} listed</span></div>
   <div class="spacer"></div><button class="bell" style="background:var(--orange);font-size:1.4rem" onclick="openOv('ovAddField')">+</button></div></div>
-  <div style="height:8px"></div>
-  ${of.length?of.map((f,i)=>`<div class="fcard" style="animation-delay:${i*80}ms">
-   <div style="position:relative"><span class="sizebadge">${sizeLabel(f.size)}</span>${pitchHTML(f)}<div class="bigprice">${f.price} EGP <small>/hr</small></div></div>
-   <div class="fb"><div class="nm"><b>${esc(f.name)}</b><span class="ratep">★ ${f.rating}</span><span class="muted" style="font-size:.8rem">(${f.reviews})</span></div>
-   <div class="loc"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z'/><circle cx='12' cy='10' r='2.5'/></svg></span> ${esc(f.area)} • ${esc(f.city)}</div>
-   <div class="tagrow"><span class="tag">${f.turf}</span><span class="tag">${f.hours}</span></div>
-   <div class="reqbtns"><button class="btn ghost sm" onclick="openReviews(${f.id})">★ Reviews (${f.reviews})</button><button class="btn ghost sm" onclick="openEditField(${f.id})"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 20l1-4 11-11 3 3-11 11z'/></svg></span> Edit</button><button class="btn red sm" onclick="delField(${f.id})"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13'/></svg></span> Remove</button></div></div></div>`).join("")
-  :`<div class="emptybox"><div class="eic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 9h16M4 9l1-5h14l1 5M5 9v11h14V9M9 20v-5h6v5'/></svg></span></div><b>No fields yet</b><span>Tap + to list your first pitch.</span></div>`}
+  <div style="padding:8px 18px 0"><div class="inwrap"><span class="ic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='6'/><path d='M20 20l-4-4'/></svg></span></span><input id="mfSearch" placeholder="Search any pitch on the app…" value="${esc(ownerQuery)}" oninput="mfSearch(this.value)"></div></div>
+  <div id="mfList"></div>
   <div style="height:20px"></div>`;
+ renderMfList();
+}
+function renderMfList(){
+ const box=$("#mfList");if(!box)return;
+ const q=ownerQuery.trim().toLowerCase();
+ const pin="<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z'/><circle cx='12' cy='10' r='2.5'/></svg></span>";
+ if(q){
+  const r=fields.filter(f=>(f.name+" "+f.city+" "+f.area+" "+sizeLabel(f.size)+" "+(f.turf||"")).toLowerCase().includes(q));
+  box.innerHTML=`<div class="secHead"><h2>All pitches</h2><span class="muted" style="margin-left:auto;font-size:.85rem">${r.length} found</span></div>`+(r.length?r.map((f,i)=>`<div class="fcard" style="animation-delay:${i*45}ms"><div style="position:relative"><span class="sizebadge">${sizeLabel(f.size)}</span>${pitchHTML(f)}<div class="bigprice">${f.price} EGP <small>/hr</small></div></div><div class="fb"><div class="nm"><b>${esc(f.name)}</b><span class="ratep">★ ${f.rating}</span><span class="muted" style="font-size:.8rem">(${f.reviews})</span></div><div class="loc">${pin} ${esc(f.area)} • ${esc(f.city)}</div><div class="tagrow"><span class="tag">${f.turf}</span><span class="tag">${f.hours}</span>${f.owner===session?'<span class="tag" style="color:var(--orange);border-color:rgba(255,106,43,.4)">Yours</span>':""}</div><div class="reqbtns"><button class="btn ghost sm" onclick="openReviews(${f.id})">★ Reviews (${f.reviews})</button></div></div></div>`).join(""):`<div class="emptybox"><div class="eic">${pin}</div><b>No pitches found</b><span>Try another name, city or size.</span></div>`);
+  return;
+ }
+ const of=ownerFields();
+ box.innerHTML=`<div style="height:8px"></div>`+(of.length?of.map((f,i)=>`<div class="fcard" style="animation-delay:${i*80}ms"><div style="position:relative"><span class="sizebadge">${sizeLabel(f.size)}</span>${pitchHTML(f)}<div class="bigprice">${f.price} EGP <small>/hr</small></div></div><div class="fb"><div class="nm"><b>${esc(f.name)}</b><span class="ratep">★ ${f.rating}</span><span class="muted" style="font-size:.8rem">(${f.reviews})</span></div><div class="loc">${pin} ${esc(f.area)} • ${esc(f.city)}</div><div class="tagrow"><span class="tag">${f.turf}</span><span class="tag">${f.hours}</span></div><div class="reqbtns"><button class="btn ghost sm" onclick="openReviews(${f.id})">★ Reviews (${f.reviews})</button><button class="btn ghost sm" onclick="openEditField(${f.id})"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 20l1-4 11-11 3 3-11 11z'/></svg></span> Edit</button><button class="btn red sm" onclick="delField(${f.id})"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13'/></svg></span> Remove</button></div></div></div>`).join(""):`<div class="emptybox"><div class="eic"><span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 9h16M4 9l1-5h14l1 5M5 9v11h14V9M9 20v-5h6v5'/></svg></span></div><b>No fields yet</b><span>Tap + to list your first pitch.</span></div>`);
 }
 function addField(){
  if(ownerFields().length>=2)return toast("You can list up to 2 pitches",ICON.warn);
