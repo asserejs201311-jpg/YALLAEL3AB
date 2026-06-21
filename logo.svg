@@ -1,0 +1,30 @@
+<svg width="560" height="180" viewBox="0 0 560 180" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="YallaEl3ab">
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FF8B3D"/>
+      <stop offset="1" stop-color="#F2630F"/>
+    </linearGradient>
+    <linearGradient id="word" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#FF8B3D"/>
+      <stop offset="1" stop-color="#F2630F"/>
+    </linearGradient>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#F2630F" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- dark brand panel -->
+  <rect x="0" y="0" width="560" height="180" rx="34" fill="#0C1322"/>
+
+  <!-- orange logo tile -->
+  <rect x="34" y="36" width="108" height="108" rx="32" fill="url(#tile)" filter="url(#soft)"/>
+
+  <!-- single letter Y mark -->
+  <path d="M66 62 L88 92 L110 62 M88 92 L88 120" stroke="#fff" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- wordmark -->
+  <text x="178" y="98" font-family="Segoe UI, Arial, sans-serif" font-size="50" font-weight="800" letter-spacing="-0.5">
+    <tspan fill="#FFFFFF">Yalla</tspan><tspan fill="url(#word)">El3ab</tspan>
+  </text>
+  <text x="180" y="128" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="600" fill="#8FA0BC" letter-spacing="0.5">Book your pitch · احجز ملعبك</text>
+</svg>
