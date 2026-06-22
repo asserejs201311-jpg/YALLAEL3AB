@@ -518,6 +518,12 @@ body.light .ringy>div{background:#fff}
 body.light .mapbox{background:linear-gradient(140deg,#eef2f9,#e2e9f4)}
 body.light .admin-input,body.light .bd-code-input{background:#fff}
 body.light .notice{background:rgba(255,138,61,.12)}
+/* keep numbers/labels readable in light mode */
+body.light .rankcard,body.light .rankcard h2,body.light .rankcard b{color:#f4f6fb}
+body.light .rankcard .muted{color:#c2cbe0}
+body.light .scard b,body.light .ostat b,body.light .pricetag,body.light .pts{color:#16213a}
+body.light .rankcard .pts{color:var(--orange)}
+body.light .bigprice{color:#fff}
 /* ===== responsive: phone -> foldable -> tablet -> laptop ===== */
 @media(min-width:740px){
  #phone{max-width:920px;margin:20px auto;min-height:calc(100vh - 40px);border-radius:30px}
@@ -546,7 +552,7 @@ body.light .notice{background:rgba(255,138,61,.12)}
 <section class="screen noTab on" id="scr-onboard">
   <div class="heroTop">
     <div class="lines"></div>
-    <div class="applogo" id="secretLogo"><svg class="ballLogo" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M19 18 L32 35 L45 18 M32 35 L32 48" stroke="#ff6a2b" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+    <div class="applogo" id="secretLogo"><svg class="ballLogo" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><g stroke="#ff6a2b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M20 42 L36 40"/><path d="M36 40 L42 27 L49 16"/><path d="M36 40 L30 29 L34 18"/><path d="M23 41 L15 50"/><path d="M23 41 L27 51"/></g><circle cx="14" cy="44" r="5" fill="#ff6a2b"/><circle cx="53" cy="11" r="5" fill="#16203a"/></svg></div>
     <h1 class="brandWord">Yalla<span>El3ab</span></h1>
     <p>The fastest way to book a pitch</p>
   </div>
@@ -960,8 +966,8 @@ document.querySelectorAll(".overlay").forEach(o=>o.addEventListener("click",e=>{
 function pitchHTML(f,cls=""){if(f&&f.image)return `<div class="pitch img ${cls}" style="background-image:url('${f.image}')"><div class="shade"></div></div>`;return `<div class="pitch ${f.style} ${cls}"><div class="circle"></div><div class="shade"></div></div>`}
 let pendingImg={add:null,edit:null};
 function readFieldImg(inp,which){const f=inp.files&&inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{pendingImg[which]=r.result;};r.readAsDataURL(f);}
-/* YallaEl3ab brand mark — a single "Y" letter (white, sits on the orange logo tile) */
-const LOGO_MARK="<svg viewBox='0 0 64 64' fill='none' xmlns='http://www.w3.org/2000/svg' style='width:72%;height:72%'><path d='M19 18 L32 35 L45 18 M32 35 L32 48' stroke='#fff' stroke-width='7' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>";
+/* YallaEl3ab brand mark — a player shooting a ball (white, sits on the orange logo tile) */
+const LOGO_MARK="<svg viewBox='0 0 64 64' fill='none' xmlns='http://www.w3.org/2000/svg' style='width:82%;height:82%'><g stroke='#fff' stroke-width='4' stroke-linecap='round' stroke-linejoin='round' fill='none'><path d='M20 42 L36 40'/><path d='M36 40 L42 27 L49 16'/><path d='M36 40 L30 29 L34 18'/><path d='M23 41 L15 50'/><path d='M23 41 L27 51'/></g><circle cx='14' cy='44' r='5' fill='#fff'/><circle cx='53' cy='11' r='5' fill='#0c1322'/></svg>";
 const SUN="<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='4'/><path d='M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19'/></svg></span>";
 const MOON="<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M21 12.8A8 8 0 0 1 11.2 3a7 7 0 1 0 9.8 9.8z'/></svg></span>";
 function applyTheme(t){document.body.classList.toggle("light",t==="light");const b=$("#themeBtn");if(b)b.innerHTML=(t==="light"?MOON:SUN);}
@@ -1013,7 +1019,7 @@ const AR={
  "No fields found":"لا توجد ملاعب","Try a different search or filter.":"جرّب بحثاً أو تصفية مختلفة.","EGP/hr":"ج.م/ساعة","EGP":"ج.م","Personal info":"المعلومات الشخصية","Profile editing coming soon":"تعديل الملف الشخصي قريباً",
  "InstaPay address (to receive)":"عنوان إنستا باي (للاستلام)","PAYMENT METHODS WE ACCEPT":"طرق الدفع التي نقبلها","Report pitch taken by someone unknown":"الإبلاغ عن ملعب استولى عليه شخص مجهول","Pay 50 EGP now":"ادفع 50 ج.م الآن","Your fields are hidden from players until you renew.":"ملاعبك مخفية عن اللاعبين حتى تجدّد الاشتراك.","Help & support":"المساعدة والدعم","Backup & restore":"النسخ الاحتياطي والاستعادة",
  "Let's get you started":"لنبدأ معك","Joining as a":"الانضمام بصفة","Joining as an":"الانضمام بصفة",
- "All":"الكل","Map view":"عرض الخريطة","5-a-side":"خماسي","7-a-side":"سباعي","11-a-side":"أحد عشر","5":"خماسي","7":"سباعي","11":"أحد عشر",
+ "AI":"الذكاء","All":"الكل","Map view":"عرض الخريطة","5-a-side":"خماسي","7-a-side":"سباعي","11-a-side":"أحد عشر","5":"خماسي","7":"سباعي","11":"أحد عشر",
  "Pitch Finder AI":"الباحث عن الملاعب","Search fields, cities...":"ابحث عن ملاعب أو مدن...","e.g. cheap 7-a-side tonight…":"مثال: سباعي رخيص الليلة…","Map":"الخريطة",
  "cheap 5-a-side":"خماسي رخيص","best rated 11-a-side":"أعلى تقييم أحد عشر","7-a-side in Giza":"سباعي في الجيزة","under 300 EGP":"أقل من 300 ج.م",
  "Yalla! I'm your Pitch Finder AI.":"يا الله! أنا الباحث عن الملاعب.","Tell me what you want and I'll find the best fields near you. Try:":"قل لي ما تريد وسأجد لك أفضل الملاعب القريبة. جرّب:",
@@ -1088,8 +1094,9 @@ function claimPitch(id){
 }
 
 /* ================= TABS / NAV ================= */
-const PLAYER_TABS=[["home","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 11l8-7 8 7'/><path d='M6 10v10h12V10'/></svg></span>","Home"],["explore","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M15 9l-2 6-4 0 2-6z'/></svg></span>","Explore"],["map","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z'/><path d='M9 4v14M15 6v14'/></svg></span>","Map"],["bookings","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='5' width='16' height='16' rx='2'/><path d='M4 9h16M8 3v4M16 3v4'/></svg></span>","Bookings"],["profile","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='8' r='4'/><path d='M5 21c0-4 3.5-6 7-6s7 2 7 6'/></svg></span>","Profile"]];
-const OWNER_TABS=[["dash","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='7' height='7' rx='1'/><rect x='14' y='3' width='7' height='7' rx='1'/><rect x='3' y='14' width='7' height='7' rx='1'/><rect x='14' y='14' width='7' height='7' rx='1'/></svg></span>","Dashboard"],["myfields","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 9h16M4 9l1-5h14l1 5M5 9v11h14V9M9 20v-5h6v5'/></svg></span>","My Fields"],["earnings","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 21h18'/><rect x='5' y='11' width='3' height='8'/><rect x='11' y='6' width='3' height='13'/><rect x='17' y='13' width='3' height='6'/></svg></span>","Earnings"],["reserv","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='5' width='16' height='16' rx='2'/><path d='M4 9h16M8 3v4M16 3v4'/></svg></span>","Bookings"],["settings","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='3'/><path d='M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2'/></svg></span>","Settings"]];
+const ROBOT_ICON="<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='5' y='8' width='14' height='11' rx='2'/><path d='M9 13h.01M15 13h.01M9 16h6M12 5v3'/><circle cx='12' cy='4' r='1'/></svg></span>";
+const PLAYER_TABS=[["home","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 11l8-7 8 7'/><path d='M6 10v10h12V10'/></svg></span>","Home"],["explore","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M15 9l-2 6-4 0 2-6z'/></svg></span>","Explore"],["map","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z'/><path d='M9 4v14M15 6v14'/></svg></span>","Map"],["ai",ROBOT_ICON,"AI"],["bookings","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='5' width='16' height='16' rx='2'/><path d='M4 9h16M8 3v4M16 3v4'/></svg></span>","Bookings"],["profile","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='8' r='4'/><path d='M5 21c0-4 3.5-6 7-6s7 2 7 6'/></svg></span>","Profile"]];
+const OWNER_TABS=[["dash","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='7' height='7' rx='1'/><rect x='14' y='3' width='7' height='7' rx='1'/><rect x='3' y='14' width='7' height='7' rx='1'/><rect x='14' y='14' width='7' height='7' rx='1'/></svg></span>","Dashboard"],["myfields","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 9h16M4 9l1-5h14l1 5M5 9v11h14V9M9 20v-5h6v5'/></svg></span>","My Fields"],["ai",ROBOT_ICON,"AI"],["earnings","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 21h18'/><rect x='5' y='11' width='3' height='8'/><rect x='11' y='6' width='3' height='13'/><rect x='17' y='13' width='3' height='6'/></svg></span>","Earnings"],["reserv","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='5' width='16' height='16' rx='2'/><path d='M4 9h16M8 3v4M16 3v4'/></svg></span>","Bookings"],["settings","<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='3'/><path d='M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2'/></svg></span>","Settings"]];
 let curTab="home";
 function buildTabbar(){
  const role=me().role,tabs=role==="owner"?OWNER_TABS:PLAYER_TABS;
@@ -1111,12 +1118,13 @@ window.addEventListener("resize",()=>requestAnimationFrame(movePill));
 let _swx=0,_swy=0,_swt=0;
 document.addEventListener("touchstart",e=>{const t=e.changedTouches[0];_swx=t.clientX;_swy=t.clientY;_swt=Date.now();},{passive:true});
 document.addEventListener("touchend",e=>{
- const fab=$("#aiFab");if(!fab||!fab.classList.contains("on"))return; // only when logged in
+ const bar=$("#tabbar");if(!bar||!bar.classList.contains("on"))return; // only when logged in
  if(document.querySelector(".overlay.show"))return; // not while a sheet is open
  const t=e.changedTouches[0],dx=t.clientX-_swx,dy=t.clientY-_swy;
  if(Date.now()-_swt<600&&dx<-65&&Math.abs(dx)>Math.abs(dy)*1.6)openAI();
 },{passive:true});
 function goTab(t){
+ if(t==="ai"){openAI();return;} // AI tab opens the assistant overlay, keeps current screen
  curTab=t;
  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.t===t));
  requestAnimationFrame(movePill);
@@ -1132,7 +1140,7 @@ function enterApp(){
  if($("#homeSearch"))$("#homeSearch").value="";
  if($("#exSearch"))$("#exSearch").value="";
  curTab=u.role==="owner"?"dash":"home";
- buildTabbar();$("#aiFab").classList.toggle("on",u.role!=="owner");
+ buildTabbar();$("#aiFab").classList.remove("on"); // AI now lives in the tab bar
  goTab(curTab);
 }
 
@@ -1914,6 +1922,7 @@ window.addEventListener("storage",e=>{
 });
 function adminGate(){
  const owners=users.filter(u=>u.role==="owner");
+ const _ar=store.get("lang","en")==="ar";
  const reports=store.get("reports",[]);
  const seats=store.get("adminSeats",[]).length;
  const shield="<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3l8 3v6c0 5-4 8-8 9-4-1-8-4-8-9V6z'/></svg></span>";
@@ -1929,6 +1938,18 @@ function adminGate(){
   <div class="ostat" style="animation-delay:.12s"><div class="oic" style="background:rgba(239,68,68,.13)">${noI}</div><span>Unpaid</span><b>${unpaid}</b></div>
   <div class="ostat" style="animation-delay:.18s"><div class="oic" style="background:rgba(239,68,68,.13)">${flag}</div><span>Reports</span><b>${reports.length}</b></div>
  </div>`;
+ const robot="<span class='ico'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='5' y='8' width='14' height='11' rx='2'/><path d='M9 13h.01M15 13h.01M9 16h6M12 5v3'/><circle cx='12' cy='4' r='1'/></svg></span>";
+ h+=`<div class="secHead" style="padding:18px 0 8px"><h2>${_ar?'مساعد الذكاء':'AI assistant'}</h2></div>`;
+ h+=`<div class="reqcard" style="margin:0 0 6px;display:block">
+   <div class="row" style="gap:10px;align-items:center;margin-bottom:8px"><div class="oic" style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;width:38px;height:38px">${robot}</div><div class="l" style="color:var(--muted)">${_ar?'يحلّل المواقع والنشاط ويرصد الحالات المشبوهة.':'Checks locations & activity, and flags suspicious patterns.'}</div></div>
+   <div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:10px">
+     <span class="mini" onclick="adminAsk('locations')">${_ar?'المواقع الأنشط':'Busiest locations'}</span>
+     <span class="mini" onclick="adminAsk('activity')">${_ar?'النشاط الأخير':'Recent activity'}</span>
+     <span class="mini" onclick="adminAsk('flag')">${_ar?'رصد المشبوه':'Flag suspicious'}</span>
+   </div>
+   <div class="row" style="gap:6px"><div class="inwrap" style="flex:1"><input id="admAiInput" placeholder="${_ar?'مثال: أي مدينة أكثر حجوزاً؟':'e.g. which city is busiest?'}" onkeydown="if(event.key==='Enter')adminAsk()"></div><button class="btn sm" onclick="adminAsk()">${_ar?'اسأل':'Ask'}</button></div>
+   <div id="admAiOut" style="margin-top:12px;white-space:pre-wrap;font-size:.9rem;line-height:1.55;color:var(--txt)"></div>
+ </div>`;
  const subPays=store.get("subPayments",[]).filter(p=>p.status==="pending");
  h+=`<div class="secHead" style="padding:18px 0 8px"><h2>Subscription payments</h2></div>`;
  h+=subPays.length?subPays.map(p=>`<div class="reqcard" style="margin:0 0 11px"><div class="top"><div style="flex:1;min-width:0"><b>${esc(p.name||p.user)}</b><div class="l" style="color:var(--muted)">${p.amount} EGP • ${esc(p.via||"InstaPay")} • ${timeAgo(p.t)}</div></div><span class="statuspill pending_verification">pending</span></div><div class="reqbtns"><button class="btn green sm" onclick="decideSubPayment(${p.id},true)">Yes, approve</button><button class="btn red sm" onclick="decideSubPayment(${p.id},false)">No</button></div></div>`).join(""):`<p class="muted" style="font-size:.85rem">No payments waiting for approval.</p>`;
@@ -1938,6 +1959,68 @@ function adminGate(){
  h+=owners.length?owners.map(o=>{const ok=o.subPaidUntil>Date.now();return `<div class="lrow" style="margin:0 0 10px"><div class="lic">${ok?okI:noI}</div><div style="flex:1"><b style="display:block">${esc(o.name)}</b><span class="muted" style="font-size:.8rem">${esc(o.email)}</span></div><span class="statuspill ${ok?"confirmed":"cancelled"}">${ok?"paid":"unpaid"}</span></div>`}).join(""):`<p class="muted" style="font-size:.85rem">No owners yet.</p>`;
  $("#adminBody").innerHTML=h;
  openOv("ovAdmin");
+}
+/* ---- Admin AI: location & activity insights, suspicious-pattern checks ---- */
+function adminSnapshot(){
+ const now=Date.now();
+ const cityB={},cityF={};
+ fields.forEach(f=>{cityF[f.city]=(cityF[f.city]||0)+1;});
+ const active=bookings.filter(b=>b.status!=="cancelled"&&b.status!=="declined");
+ active.forEach(b=>{const f=fields.find(x=>x.id===b.fieldId);if(f)cityB[f.city]=(cityB[f.city]||0)+1;});
+ const recent=bookings.filter(b=>b.created&&now-b.created<48*36e5);
+ const byStatus={};bookings.forEach(b=>{byStatus[b.status]=(byStatus[b.status]||0)+1;});
+ const owners=users.filter(u=>u.role==="owner");
+ const reports=store.get("reports",[]);
+ const subPays=store.get("subPayments",[]).filter(p=>p.status==="pending");
+ const userCnt={};bookings.filter(b=>b.created&&now-b.created<24*36e5).forEach(b=>{userCnt[b.user]=(userCnt[b.user]||0)+1;});
+ const heavy=Object.entries(userCnt).filter(e=>e[1]>=4).map(e=>({user:e[0],count:e[1]}));
+ return {cityBookings:cityB,cityPitches:cityF,recentBookings:recent.length,bookingsByStatus:byStatus,owners:owners.length,paidOwners:owners.filter(o=>o.subPaidUntil>now).length,openReports:reports.length,paymentsAwaitingApproval:subPays.length,heavyUsers:heavy};
+}
+function adminInsightLocal(q){
+ const ar=store.get("lang","en")==="ar",s=adminSnapshot(),ql=(q||"").toLowerCase();
+ const cities=Object.keys(s.cityPitches).sort((a,b)=>(s.cityBookings[b]||0)-(s.cityBookings[a]||0));
+ const wantLoc=q==="locations"||/location|city|where|busiest|مدينة|مكان|موقع|أنشط/.test(ql);
+ const wantAct=q==="activity"||/activity|recent|today|نشاط|حركة|اليوم|الأخير/.test(ql);
+ const wantFlag=q==="flag"||/flag|suspicious|fraud|abuse|مشبوه|احتيال|تنبيه|رصد/.test(ql);
+ const out=[];
+ if(wantLoc||(!wantAct&&!wantFlag)){
+  out.push(ar?"أكثر المواقع نشاطاً:":"Busiest locations:");
+  if(cities.length)cities.slice(0,5).forEach((c,i)=>out.push(`${i+1}. ${ar?(AR[c]||c):c} — ${s.cityBookings[c]||0} ${ar?"حجز":"bookings"} · ${s.cityPitches[c]||0} ${ar?"ملعب":"pitches"}`));
+  else out.push(ar?"لا توجد ملاعب بعد.":"No pitches yet.");
+ }
+ if(wantAct){
+  out.push((out.length?"\n":"")+(ar?"النشاط (آخر 48 ساعة):":"Activity (last 48h):"));
+  out.push(`• ${s.recentBookings} ${ar?"حجوزات جديدة":"new bookings"}`);
+  const st=Object.keys(s.bookingsByStatus).map(k=>`${k}: ${s.bookingsByStatus[k]}`).join("  ·  ");
+  out.push("• "+(st||(ar?"لا حجوزات":"no bookings")));
+  out.push(`• ${s.paidOwners}/${s.owners} ${ar?"ملاك مشتركين":"owners subscribed"}`);
+ }
+ if(wantFlag){
+  out.push((out.length?"\n":"")+(ar?"فحص الحالات المشبوهة:":"Suspicious check:"));
+  if(s.heavyUsers.length)s.heavyUsers.forEach(h=>out.push(`• ${ar?"مستخدم بحجوزات كثيرة":"High-volume user"}: ${h.user} (${h.count} ${ar?"خلال 24س":"in 24h"})`));
+  else out.push("• "+(ar?"لا شيء غير معتاد في الحجوزات.":"Nothing unusual in bookings."));
+  if(s.openReports)out.push(`• ${s.openReports} ${ar?"بلاغ مفتوح يحتاج مراجعة":"open report(s) to review"}`);
+  if(s.paymentsAwaitingApproval)out.push(`• ${s.paymentsAwaitingApproval} ${ar?"مدفوعات بانتظار الاعتماد":"payment(s) awaiting approval"}`);
+ }
+ return out.join("\n");
+}
+async function adminRealAI(q,key){
+ const s=adminSnapshot(),ar=store.get("lang","en")==="ar";
+ const sys="You are the YallaEl3ab platform admin analytics assistant. Using the JSON snapshot of platform activity, answer the admin's question with concise, actionable insights about locations and activity, and flag anything suspicious. Use short bullet points."+(ar?" Respond in Arabic (العربية).":"");
+ const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true","content-type":"application/json"},body:JSON.stringify({model:AI_MODEL,max_tokens:450,system:sys,messages:[{role:"user",content:"Snapshot:\n"+JSON.stringify(s)+"\n\nQuestion: "+(q||"Give me an overview")}]})});
+ if(!res.ok)throw new Error("ai_http_"+res.status);
+ const data=await res.json();return (data.content&&data.content[0]&&data.content[0].text)||adminInsightLocal(q);
+}
+function adminAsk(preset){
+ const inp=$("#admAiInput"),out=$("#admAiOut");
+ const q=preset||(inp?inp.value.trim():"");
+ if(!q)return;
+ if(inp&&!preset)inp.value="";
+ const ar=store.get("lang","en")==="ar";
+ if(out)out.textContent=ar?"…جارٍ التحليل":"Analyzing…";
+ const key=store.get("aiKey","");
+ if(key)adminRealAI(q,key).then(t=>{if(out)out.textContent=t;}).catch(()=>{if(out)out.textContent=adminInsightLocal(q);});
+ else if(out)out.textContent=adminInsightLocal(q);
 }
 
 /* ================= INIT ================= */
